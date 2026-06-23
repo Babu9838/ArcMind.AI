@@ -6,42 +6,79 @@
 <title>ArcMind AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
-/* আপনার আগের সিএসএস (CSS) এখানে যা ছিল সব আছে */
 *{box-sizing:border-box;margin:0;padding:0}
 body{min-height:100vh;background:linear-gradient(135deg,#020818,#0a1628,#0d1f3c);font-family:'Inter',sans-serif;color:#e2e8f0}
-/* ... বাকি সিএসএস যা ছিল সব ঠিক আছে ... */
-.ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(2,8,24,.88);backdrop-filter:blur(14px);animation:fadeIn .2s ease}
-.mo{background:linear-gradient(135deg,#0a1628,#0d1f3c);border:1px solid rgba(99,102,241,.3);border-radius:24px;padding:28px;width:92%;max-width:380px;position:relative}
+input,textarea,select,button{font-family:'Inter',sans-serif}
+input::placeholder,textarea::placeholder{color:#475569}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#6366f1;border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+/* HEADER */
+#hdr{background:rgba(2,8,24,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.2);padding:0 20px;position:sticky;top:0;z-index:50}
+#hdr-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
+#logo{display:flex;align-items:center;gap:10px}
+#logo-box{background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:10px;padding:6px;border:1px solid rgba(148,163,184,.2);display:flex}
+.aname{font-size:17px;font-weight:800;background:linear-gradient(90deg,#e2e8f0,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.asub{font-size:9px;color:#6366f1;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+#hdr-r{display:flex;align-items:center;gap:8px}
+#chain-sw{display:none;gap:6px}
+.cbn{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);color:#94a3b8;cursor:pointer}
+.cbn.on{border-color:#6366f1;color:#6366f1;background:rgba(99,102,241,.15)}
+#cbtn{padding:8px 18px;border-radius:24px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+#cbtn.on{background:linear-gradient(135deg,#10b981,#059669)}
+/* TABS */
+#tabs{background:rgba(10,22,40,.9);border-bottom:1px solid rgba(99,102,241,.12);overflow-x:auto}
+#tabs-in{max-width:1200px;margin:0 auto;display:flex;padding:0 20px}
+.tab{padding:13px 14px;border:none;background:none;cursor:pointer;font-weight:600;font-size:13px;color:#64748b;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab.on{color:#6366f1;border-bottom-color:#6366f1}
+/* MAIN */
+#main{max-width:1200px;margin:0 auto;padding:28px 20px}
+.pg{display:none;animation:fadeIn .3s ease}.pg.on{display:block}
+.card{background:rgba(10,22,40,.8);border:1px solid rgba(99,102,241,.15);border-radius:18px;padding:22px}
+.btn{width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.inp{width:100%;padding:13px 15px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:11px;color:#e2e8f0;font-size:14px;outline:none}
+.lbl{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.sc{border-radius:18px;padding:20px}
 #notif{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13px;z-index:99999;box-shadow:0 6px 20px rgba(16,185,129,.4);transform:translateY(70px);opacity:0;transition:.35s ease}
 #notif.on{transform:translateY(0);opacity:1}
-/* আপনার আগের বাকি সব স্টাইল এখানে বসিয়ে দিন */
 </style>
 </head>
 <body>
 <div id="notif"></div>
 
-<!-- আপনার আগের পুরো HTML এবং সেকশনগুলো এখানে আছে -->
-<!-- শুধু হেডার এবং ওয়েলকাম সেকশনের বাটনে onclick="showWallet()" যুক্ত করে দিয়েছি -->
-
+<!-- HEADER -->
 <header id="hdr">
-  <!-- ... আগের হেডার কোড ... -->
-  <button id="cbtn" onclick="showWallet()">&#x1F98A; Connect Wallet</button>
+  <div id="hdr-in">
+    <div id="logo">
+      <div id="logo-box">
+        <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
+          <path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="#64748b"/>
+        </svg>
+      </div>
+      <div><div class="aname">ArcMind AI</div><div class="asub">USDC Intelligence Layer</div></div>
+    </div>
+    <div id="hdr-r">
+      <div id="chain-sw"><button class="cbn on">ETH</button><button class="cbn">BASE</button><button class="cbn">ARB</button></div>
+      <button id="cbtn" onclick="showWallet()">&#x1F98A; Connect Wallet</button>
+    </div>
+  </div>
 </header>
 
 <main id="main">
+  <!-- DASHBOARD -->
   <section id="pg-dash" class="pg on">
-    <div id="welcome">
-        <!-- ... আগের ওয়েলকাম কন্টেন্ট ... -->
-        <button onclick="showWallet()">Connect Wallet</button>
+    <div id="welcome" style="text-align:center;padding:70px 20px">
+      <h1>ArcMind AI</h1>
+      <button onclick="showWallet()" style="padding:14px 36px;border-radius:28px;border:none;cursor:pointer;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;margin-top:20px">Connect Wallet</button>
     </div>
     <div id="dash-body" style="display:none">
-        <!-- ... আপনার ড্যাশবোর্ডের মূল কন্টেন্ট যা আগে ছিল ... -->
+       <div class="card"><h2>Dashboard</h2><p>Wallet Connected Successfully!</p></div>
     </div>
   </section>
 </main>
 
 <script>
-    // ওয়ালেট কানেক্টের মূল ফাংশন
     async function showWallet() {
         if (window.ethereum) {
             try {
@@ -50,28 +87,26 @@ body{min-height:100vh;background:linear-gradient(135deg,#020818,#0a1628,#0d1f3c)
                 
                 // বাটন আপডেট
                 const cbtn = document.getElementById('cbtn');
-                cbtn.innerText = "Connected: " + account.substring(0, 6) + "...";
+                cbtn.innerHTML = `&#x2705; ${account.substring(0, 6)}...${account.slice(-4)}`;
                 cbtn.classList.add('on');
                 
-                // ড্যাশবোর্ড দেখানো
+                // ভিউ আপডেট
                 document.getElementById('welcome').style.display = 'none';
                 document.getElementById('dash-body').style.display = 'block';
                 document.getElementById('chain-sw').style.display = 'flex';
                 
                 // নোটিফিকেশন
                 const n = document.getElementById('notif');
-                n.innerText = "Wallet Connected Successfully!";
+                n.innerText = "Wallet Connected!";
                 n.classList.add('on');
                 setTimeout(() => n.classList.remove('on'), 3000);
-            } catch (error) {
+            } catch (err) {
                 alert("Connection failed.");
             }
         } else {
-            alert("Please install MetaMask!");
+            alert("Please install MetaMask.");
         }
     }
-    
-    // আপনার আগের সব ফাংশন (go, resolveAddr, etc) এখানে রেখে দিন
 </script>
 </body>
 </html>
