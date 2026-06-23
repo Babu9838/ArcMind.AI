@@ -14,6 +14,7 @@ input::placeholder,textarea::placeholder{color:#475569}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* HEADER */
 #hdr{background:rgba(2,8,24,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.2);padding:0 20px;position:sticky;top:0;z-index:50}
 #hdr-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
 #logo{display:flex;align-items:center;gap:10px}
@@ -26,20 +27,39 @@ input::placeholder,textarea::placeholder{color:#475569}
 .cbn.on{border-color:#6366f1;color:#6366f1;background:rgba(99,102,241,.15)}
 #cbtn{padding:8px 18px;border-radius:24px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
 #cbtn.on{background:linear-gradient(135deg,#10b981,#059669)}
+/* TABS */
 #tabs{background:rgba(10,22,40,.9);border-bottom:1px solid rgba(99,102,241,.12);overflow-x:auto}
 #tabs-in{max-width:1200px;margin:0 auto;display:flex;padding:0 20px}
 .tab{padding:13px 14px;border:none;background:none;cursor:pointer;font-weight:600;font-size:13px;color:#64748b;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .tab.on{color:#6366f1;border-bottom-color:#6366f1}
+/* MAIN */
 #main{max-width:1200px;margin:0 auto;padding:28px 20px}
 .pg{display:none;animation:fadeIn .3s ease}.pg.on{display:block}
 .card{background:rgba(10,22,40,.8);border:1px solid rgba(99,102,241,.15);border-radius:18px;padding:22px}
 .btn{width:100%;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-weight:800;font-size:14px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:not-allowed}
 .inp{width:100%;padding:13px 15px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:11px;color:#e2e8f0;font-size:14px;outline:none}
+.inp:focus{border-color:#6366f1}
 .lbl{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px}
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
 .sc{border-radius:18px;padding:20px}
+/* WALLET MODAL */
+.ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(2,8,24,.88);backdrop-filter:blur(14px);animation:fadeIn .2s ease}
+.mo{background:linear-gradient(135deg,#0a1628,#0d1f3c);border:1px solid rgba(99,102,241,.3);border-radius:24px;padding:28px;width:92%;max-width:380px;position:relative}
+.mc{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.08);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;color:#94a3b8;font-size:16px;line-height:30px;text-align:center}
+.wo{width:100%;padding:14px 16px;border-radius:13px;cursor:pointer;display:flex;align-items:center;gap:12px;color:#e2e8f0;margin-bottom:9px;border:none}
+.wi{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+/* CHAT */
+#chat-box{height:400px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.cm{display:flex;gap:8px;animation:fadeIn .2s ease}.cm.u{justify-content:flex-end}
+.cb{max-width:78%;padding:11px 14px;font-size:13px;line-height:1.6;border-radius:16px}
+.cb.ai{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.cb.u{background:linear-gradient(135deg,#6366f1,#8b5cf6)}
+.dot{width:7px;height:7px;border-radius:50%;background:#6366f1;animation:pulse 1s infinite;display:inline-block}
+/* NOTIF */
 #notif{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13px;z-index:99999;box-shadow:0 6px 20px rgba(16,185,129,.4);transform:translateY(70px);opacity:0;transition:.35s ease}
 #notif.on{transform:translateY(0);opacity:1}
+.pb{height:5px;background:rgba(255,255,255,.05);border-radius:3px}
+.pf{height:100%;border-radius:3px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
 @media(max-width:700px){.g2{grid-template-columns:1fr}}
 </style>
@@ -47,58 +67,194 @@ input::placeholder,textarea::placeholder{color:#475569}
 <body>
 <div id="notif"></div>
 
+<!-- HEADER -->
 <header id="hdr">
   <div id="hdr-in">
     <div id="logo">
       <div id="logo-box">
         <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
-          <path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="#64748b"/>
+          <defs><linearGradient id="lg1" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/>
+          </linearGradient></defs>
+          <path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#lg1)"/>
+          <ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#lg1)"/>
         </svg>
       </div>
-      <div><div class="aname">ArcMind AI</div><div class="asub">USDC Intelligence Layer</div></div>
+      <div>
+        <div class="aname">ArcMind AI</div>
+        <div class="asub">USDC Intelligence Layer</div>
+      </div>
     </div>
     <div id="hdr-r">
       <div id="chain-sw">
-        <button class="cbn on" onclick="selChain(this,'ETH')">ETH</button>
-        <button class="cbn" onclick="selChain(this,'BASE')">BASE</button>
+        <button class="cbn on" onclick="selChain(this,'ETH','#627eea')">ETH</button>
+        <button class="cbn" onclick="selChain(this,'BASE','#0052ff')">BASE</button>
+        <button class="cbn" onclick="selChain(this,'ARB','#28a0f0')">ARB</button>
       </div>
       <button id="cbtn" onclick="showWallet()">&#x1F98A; Connect Wallet</button>
     </div>
   </div>
 </header>
 
+<!-- TABS -->
+<nav id="tabs"><div id="tabs-in">
+  <button class="tab on" onclick="go('dash',this)">&#9889; Dashboard</button>
+  <button class="tab" onclick="go('send',this)">&#x1F4B8; Send</button>
+  <button class="tab" onclick="go('bridge',this)">&#x1F309; Bridge</button>
+  <button class="tab" onclick="go('yield',this)">&#x1F33E; Yield</button>
+  <button class="tab" onclick="go('ai',this)">&#x1F916; AI Chat</button>
+  <button class="tab" onclick="go('sim',this)">&#x1F9EA; Simulator</button>
+  <button class="tab" onclick="go('fraud',this)">&#x1F6E1;&#xFE0F; Fraud Radar</button>
+  <button class="tab" onclick="go('feat',this)">&#x2728; Features</button>
+</div></nav>
+
 <main id="main">
-  <section id="pg-dash" class="pg on">
-    <div id="welcome" style="text-align:center;padding:70px 20px">
-      <h1>ArcMind AI</h1>
-      <button onclick="showWallet()" style="padding:14px 36px;border-radius:28px;border:none;cursor:pointer;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;margin-top:20px">Connect Wallet</button>
+
+<!-- DASHBOARD -->
+<section id="pg-dash" class="pg on">
+  <div id="welcome" style="text-align:center;padding:70px 20px">
+    <div style="display:inline-flex;background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:20px;padding:20px;border:1px solid rgba(148,163,184,.15);margin-bottom:20px">
+      <svg width="70" height="70" viewBox="0 0 100 100" fill="none">
+        <defs><linearGradient id="lg2" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/>
+        </linearGradient></defs>
+        <path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#lg2)"/>
+        <ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#lg2)"/>
+      </svg>
     </div>
-  </section>
-</main>
+    <h1 style="font-size:38px;font-weight:900;background:linear-gradient(135deg,#e2e8f0,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">ArcMind AI</h1>
+    <p style="color:#94a3b8;font-size:16px;margin-bottom:6px">AI-Powered USDC Financial Intelligence Layer</p>
+    <p style="color:#475569;font-size:13px;margin-bottom:34px">Built on Arc Network &middot; Circle WaaS &middot; Enhanced by AI</p>
+    <button onclick="showWallet()" style="padding:14px 36px;border-radius:28px;border:none;cursor:pointer;font-size:15px;font-weight:800;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 8px 28px rgba(99,102,241,.4)">
+      &#x1F98A; Connect Wallet
+    </button>
+    <div style="margin-top:36px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:520px;margin:36px auto 0">
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:24px;margin-bottom:5px">&#x1F510;</div>
+        <div style="font-weight:700;font-size:12px">Circle WaaS</div>
+        <div style="font-size:10px;color:#64748b;margin-top:3px">Programmable wallets</div>
+      </div>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:24px;margin-bottom:5px">&#x1F309;</div>
+        <div style="font-weight:700;font-size:12px">CCTP Bridge</div>
+        <div style="font-size:10px;color:#64748b;margin-top:3px">Cross-chain USDC</div>
+      </div>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center">
+        <div style="font-size:24px;margin-bottom:5px">&#x1F916;</div>
+        <div style="font-weight:700;font-size:12px">AI Intelligence</div>
+        <div style="font-size:10px;color:#64748b;margin-top:3px">Smart DeFi assistant</div>
+      </div>
+    </div>
+  </div>
 
-<script>
-async function showWallet() {
-    if (window.ethereum) {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const account = accounts[0];
-            const cbtn = document.getElementById('cbtn');
-            cbtn.innerHTML = `&#x2705; ${account.substring(0, 6)}...${account.slice(-4)}`;
-            cbtn.classList.add('on');
-            document.getElementById('chain-sw').style.display = 'flex';
-            
-            const n = document.getElementById('notif');
-            n.innerText = "Wallet Connected!";
-            n.classList.add('on');
-            setTimeout(() => n.classList.remove('on'), 3000);
-        } catch (err) { alert("Error connecting wallet"); }
-    } else { alert("MetaMask not found!"); }
-}
+  <div id="dash-body" style="display:none">
+    <div class="sg">
+      <div class="sc" style="background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(10,22,40,.8));border:1px solid rgba(99,102,241,.2)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Total USDC Balance</span><span style="font-size:20px">&#x1F4B0;</span></div>
+        <div style="font-size:26px;font-weight:800;color:#6366f1">$12,847.32</div>
+        <div style="font-size:11px;color:#475569;margin-top:4px">Across 5 chains</div>
+      </div>
+      <div class="sc" style="background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(10,22,40,.8));border:1px solid rgba(16,185,129,.2)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Yield Earned (30d)</span><span style="font-size:20px">&#x1F33E;</span></div>
+        <div style="font-size:26px;font-weight:800;color:#10b981">+$234.18</div>
+        <div style="font-size:11px;color:#475569;margin-top:4px">APY: 8.4%</div>
+      </div>
+      <div class="sc" style="background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(10,22,40,.8));border:1px solid rgba(245,158,11,.2)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Pending Round-ups</span><span style="font-size:20px">&#x1F437;</span></div>
+        <div style="font-size:26px;font-weight:800;color:#f59e0b">$4.27</div>
+        <div style="font-size:11px;color:#475569;margin-top:4px">Auto-save enabled</div>
+      </div>
+      <div class="sc" style="background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(10,22,40,.8));border:1px solid rgba(14,165,233,.2)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Gas Saved</span><span style="font-size:20px">&#x26FD;</span></div>
+        <div style="font-size:26px;font-weight:800;color:#0ea5e9">$18.90</div>
+        <div style="font-size:11px;color:#475569;margin-top:4px">Via Gas Station</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card"><div style="font-weight:700;margin-bottom:14px">&#x2696;&#xFE0F; Unified Balance by Chain</div><div id="chain-bars"></div></div>
+      <div class="card"><div style="font-weight:700;margin-bottom:14px">&#x1F550; Recent Transactions</div><div id="recent-txs"></div></div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.3);border-radius:18px;padding:20px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:34px">&#x1F916;</div>
+      <div style="flex:1">
+        <div style="font-weight:700;margin-bottom:4px">ArcMind AI Insight</div>
+        <div style="color:#94a3b8;font-size:13px">Arbitrum balance ($1,891) earns 0% yield. Found <span style="color:#10b981;font-weight:700">9.2% APY</span> on Aave v3 &mdash; auto-rebalance = ~$174/year extra.</div>
+      </div>
+      <button onclick="go('yield',document.querySelectorAll('.tab')[3])" style="padding:9px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap">View Yield &#x2192;</button>
+    </div>
+  </div>
+</section>
 
-function selChain(btn, name) {
-    document.querySelectorAll('.cbn').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-}
-</script>
-</body>
-</html>
+<!-- SEND -->
+<section id="pg-send" class="pg">
+  <div style="max-width:480px;margin:0 auto">
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F4B8; Send USDC</h2>
+    <p style="color:#64748b;margin-bottom:24px">Send to wallet, ENS, or natural language address</p>
+    <div class="card" style="border-radius:22px;padding:26px">
+      <div style="margin-bottom:16px">
+        <label class="lbl">Recipient</label>
+        <input id="send-to" class="inp" placeholder="vitalik.eth, alice.arc, or 0x..." oninput="resolveAddr(this.value)"/>
+        <div id="resolved" style="margin-top:5px;font-size:12px;color:#6366f1;display:none">&#x1F4D6; Resolved: 0x4a2f...8e91</div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label class="lbl">Amount (USDC)</label>
+        <div style="position:relative">
+          <input id="send-amt" class="inp" placeholder="0.00" type="number" style="font-size:20px;font-weight:700;padding-right:65px"/>
+          <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#6366f1;font-weight:700">USDC</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
+        <div style="background:rgba(99,102,241,.08);border-radius:10px;padding:12px"><div style="font-size:10px;color:#64748b">Gas Fee</div><div style="font-weight:700;color:#10b981">FREE &#x26FD;</div></div>
+        <div style="background:rgba(99,102,241,.08);border-radius:10px;padding:12px"><div style="font-size:10px;color:#64748b">Network</div><div id="net-name" style="font-weight:700;color:#627eea">Ethereum</div></div>
+      </div>
+      <button class="btn" onclick="doSend()">Send USDC &#x2192;</button>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="go('sim',document.querySelectorAll('.tab')[5])" style="flex:1;padding:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:10px;color:#6366f1;font-weight:700;cursor:pointer;font-size:12px">&#x1F9EA; Simulate</button>
+        <button onclick="notif('USDC Streaming activated!')" style="flex:1;padding:10px;background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.3);border-radius:10px;color:#ec4899;font-weight:700;cursor:pointer;font-size:12px">&#x1F4B8; Stream</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRIDGE -->
+<section id="pg-bridge" class="pg">
+  <div style="max-width:500px;margin:0 auto">
+    <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F309; Cross-Chain Bridge</h2>
+    <p style="color:#64748b;margin-bottom:24px">Move USDC across chains via Circle CCTP</p>
+    <div class="card" style="border-radius:22px;padding:26px;border-color:rgba(139,92,246,.2)">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:16px">
+        <div><label class="lbl">From</label>
+          <select class="inp" style="cursor:pointer">
+            <option>Ethereum</option><option>Base</option><option>Solana</option><option>Arbitrum</option><option>Polygon</option>
+          </select>
+        </div>
+        <div style="padding-bottom:8px;font-size:20px;color:#6366f1;cursor:pointer" onclick="notif('Chains swapped!')">&#x21C4;</div>
+        <div><label class="lbl">To</label>
+          <select class="inp" style="cursor:pointer">
+            <option>Base</option><option>Ethereum</option><option>Arbitrum</option><option>Polygon</option>
+          </select>
+        </div>
+      </div>
+      <input class="inp" placeholder="Amount in USDC" type="number" style="margin-bottom:16px;font-size:18px;font-weight:700"/>
+      <div style="background:rgba(139,92,246,.08);border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Protocol</span><span style="font-size:13px;font-weight:600">Circle CCTP v2</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Est. Time</span><span style="font-size:13px;font-weight:600">~2 minutes</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Bridge Fee</span><span style="color:#10b981;font-size:13px;font-weight:600">$0.00</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="color:#64748b;font-size:13px">Replay Protection</span><span style="color:#10b981;font-size:13px;font-weight:600">&#x2705; Active</span></div>
+      </div>
+      <button class="btn" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)" onclick="notif('Bridge initiated via CCTP!')">Bridge &#x2192;</button>
+    </div>
+  </div>
+</section>
+
+<!-- YIELD -->
+<section id="pg-yield" class="pg">
+  <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F33E; AI Yield Optimizer</h2>
+  <p style="color:#64748b;margin-bottom:24px">Multi-chain DeFi yield with AI auto-rebalancing</p>
+  <div id="yield-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px"></div>
+  <div class="card" style="margin-top:18px">
+    <div style="font-weight:700;margin-bottom:12px">&#x1F916; Auto-Rebalancer</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <div style="background:rgba(99,102,241,.08);border-radius:12px;padding:14px"><div style="font-size:18px;margin-bottom:5px">&#x2699;&#xFE0F;</div><div style="font-size:10px;color:#64748b">Threshold</div><div style="font-weight:700;color:#6366f1;font-size:12px">2% drift</div></div>
+      <div style="background:rgba(99,102,241,.08);border-radius:12px;padding:14px"><div style="font-size:18px;margin-bottom:5px">&#x1F504;</div><div style="font-size:10px;color:#64748b">Compound</div><div style="font-weight:700;color:#6366f1;font-size:12px">Weekly</div></div>
+      <div style="background:rgba(99,102,241,.08);border-radius:12px;padding:14px"><div style="font-size:18px;margin-bottom:5px">&#x1F6E1;&#xFE0F;</div><div style="font-size:10px;color:#64748b">Risk Leve
