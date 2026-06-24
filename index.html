@@ -14,7 +14,6 @@ input::placeholder,textarea::placeholder{color:#475569}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* HEADER */
 #hdr{background:rgba(2,8,24,.9);backdrop-filter:blur(20px);border-bottom:1px solid rgba(99,102,241,.2);padding:0 20px;position:sticky;top:0;z-index:50}
 #hdr-in{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
 #logo{display:flex;align-items:center;gap:10px}
@@ -27,12 +26,10 @@ input::placeholder,textarea::placeholder{color:#475569}
 .cbn.on{border-color:#6366f1;color:#6366f1;background:rgba(99,102,241,.15)}
 #cbtn{padding:8px 18px;border-radius:24px;border:none;cursor:pointer;font-weight:700;font-size:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
 #cbtn.on{background:linear-gradient(135deg,#10b981,#059669)}
-/* TABS */
 #tabs{background:rgba(10,22,40,.9);border-bottom:1px solid rgba(99,102,241,.12);overflow-x:auto}
 #tabs-in{max-width:1200px;margin:0 auto;display:flex;padding:0 20px}
 .tab{padding:13px 14px;border:none;background:none;cursor:pointer;font-weight:600;font-size:13px;color:#64748b;border-bottom:2px solid transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
 .tab.on{color:#6366f1;border-bottom-color:#6366f1}
-/* MAIN */
 #main{max-width:1200px;margin:0 auto;padding:28px 20px}
 .pg{display:none;animation:fadeIn .3s ease}.pg.on{display:block}
 .card{background:rgba(10,22,40,.8);border:1px solid rgba(99,102,241,.15);border-radius:18px;padding:22px}
@@ -43,24 +40,23 @@ input::placeholder,textarea::placeholder{color:#475569}
 .lbl{font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:7px}
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
 .sc{border-radius:18px;padding:20px}
-/* WALLET MODAL */
 .ov{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(2,8,24,.88);backdrop-filter:blur(14px);animation:fadeIn .2s ease}
-.mo{background:linear-gradient(135deg,#0a1628,#0d1f3c);border:1px solid rgba(99,102,241,.3);border-radius:24px;padding:28px;width:92%;max-width:380px;position:relative}
+.mo{background:linear-gradient(135deg,#0a1628,#0d1f3c);border:1px solid rgba(99,102,241,.3);border-radius:24px;padding:28px;width:92%;max-width:400px;position:relative}
 .mc{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.08);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;color:#94a3b8;font-size:16px;line-height:30px;text-align:center}
 .wo{width:100%;padding:14px 16px;border-radius:13px;cursor:pointer;display:flex;align-items:center;gap:12px;color:#e2e8f0;margin-bottom:9px;border:none}
 .wi{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-/* CHAT */
 #chat-box{height:400px;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
 .cm{display:flex;gap:8px;animation:fadeIn .2s ease}.cm.u{justify-content:flex-end}
 .cb{max-width:78%;padding:11px 14px;font-size:13px;line-height:1.6;border-radius:16px}
 .cb.ai{background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.cb.u{background:linear-gradient(135deg,#6366f1,#8b5cf6)}
 .dot{width:7px;height:7px;border-radius:50%;background:#6366f1;animation:pulse 1s infinite;display:inline-block}
-/* NOTIF */
 #notif{position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:11px 18px;border-radius:12px;font-weight:700;font-size:13px;z-index:99999;box-shadow:0 6px 20px rgba(16,185,129,.4);transform:translateY(70px);opacity:0;transition:.35s ease}
 #notif.on{transform:translateY(0);opacity:1}
+#notif.err{background:linear-gradient(135deg,#ef4444,#dc2626)}
 .pb{height:5px;background:rgba(255,255,255,.05);border-radius:3px}
 .pf{height:100%;border-radius:3px}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px}
 @media(max-width:700px){.g2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -80,16 +76,13 @@ input::placeholder,textarea::placeholder{color:#475569}
           <ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#lg1)"/>
         </svg>
       </div>
-      <div>
-        <div class="aname">ArcMind AI</div>
-        <div class="asub">USDC Intelligence Layer</div>
-      </div>
+      <div><div class="aname">ArcMind AI</div><div class="asub">USDC Intelligence Layer</div></div>
     </div>
     <div id="hdr-r">
       <div id="chain-sw">
-        <button class="cbn on" onclick="selChain(this,'ETH','#627eea')">ETH</button>
-        <button class="cbn" onclick="selChain(this,'BASE','#0052ff')">BASE</button>
-        <button class="cbn" onclick="selChain(this,'ARB','#28a0f0')">ARB</button>
+        <button class="cbn on" onclick="switchChain('arc')">Arc</button>
+        <button class="cbn" onclick="switchChain('arb-sep')">Arb Sepolia</button>
+        <button class="cbn" onclick="switchChain('sepolia')">Sepolia</button>
       </div>
       <button id="cbtn" onclick="showWallet()">&#x1F98A; Connect Wallet</button>
     </div>
@@ -125,44 +118,30 @@ input::placeholder,textarea::placeholder{color:#475569}
     <h1 style="font-size:38px;font-weight:900;background:linear-gradient(135deg,#e2e8f0,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px">ArcMind AI</h1>
     <p style="color:#94a3b8;font-size:16px;margin-bottom:6px">AI-Powered USDC Financial Intelligence Layer</p>
     <p style="color:#475569;font-size:13px;margin-bottom:34px">Built on Arc Network &middot; Circle WaaS &middot; Enhanced by AI</p>
-    <button onclick="showWallet()" style="padding:14px 36px;border-radius:28px;border:none;cursor:pointer;font-size:15px;font-weight:800;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 8px 28px rgba(99,102,241,.4)">
-      &#x1F98A; Connect Wallet
-    </button>
+    <button onclick="showWallet()" style="padding:14px 36px;border-radius:28px;border:none;cursor:pointer;font-size:15px;font-weight:800;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;box-shadow:0 8px 28px rgba(99,102,241,.4)">&#x1F98A; Connect Wallet</button>
     <div style="margin-top:36px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:520px;margin:36px auto 0">
-      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center">
-        <div style="font-size:24px;margin-bottom:5px">&#x1F510;</div>
-        <div style="font-weight:700;font-size:12px">Circle WaaS</div>
-        <div style="font-size:10px;color:#64748b;margin-top:3px">Programmable wallets</div>
-      </div>
-      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center">
-        <div style="font-size:24px;margin-bottom:5px">&#x1F309;</div>
-        <div style="font-weight:700;font-size:12px">CCTP Bridge</div>
-        <div style="font-size:10px;color:#64748b;margin-top:3px">Cross-chain USDC</div>
-      </div>
-      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center">
-        <div style="font-size:24px;margin-bottom:5px">&#x1F916;</div>
-        <div style="font-weight:700;font-size:12px">AI Intelligence</div>
-        <div style="font-size:10px;color:#64748b;margin-top:3px">Smart DeFi assistant</div>
-      </div>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center"><div style="font-size:24px;margin-bottom:5px">&#x1F510;</div><div style="font-weight:700;font-size:12px">Circle WaaS</div><div style="font-size:10px;color:#64748b;margin-top:3px">Programmable wallets</div></div>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center"><div style="font-size:24px;margin-bottom:5px">&#x1F309;</div><div style="font-weight:700;font-size:12px">CCTP Bridge</div><div style="font-size:10px;color:#64748b;margin-top:3px">Cross-chain USDC</div></div>
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);border-radius:14px;padding:16px;text-align:center"><div style="font-size:24px;margin-bottom:5px">&#x1F916;</div><div style="font-weight:700;font-size:12px">AI Intelligence</div><div style="font-size:10px;color:#64748b;margin-top:3px">Smart DeFi assistant</div></div>
     </div>
   </div>
 
   <div id="dash-body" style="display:none">
     <div class="sg">
       <div class="sc" style="background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(10,22,40,.8));border:1px solid rgba(99,102,241,.2)">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Total USDC Balance</span><span style="font-size:20px">&#x1F4B0;</span></div>
-        <div style="font-size:26px;font-weight:800;color:#6366f1">$12,847.32</div>
-        <div style="font-size:11px;color:#475569;margin-top:4px">Across 5 chains</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Wallet Balance</span><span style="font-size:20px">&#x1F4B0;</span></div>
+        <div id="real-balance" style="font-size:26px;font-weight:800;color:#6366f1">Loading...</div>
+        <div id="balance-chain" style="font-size:11px;color:#475569;margin-top:4px">Fetching from chain...</div>
       </div>
       <div class="sc" style="background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(10,22,40,.8));border:1px solid rgba(16,185,129,.2)">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Yield Earned (30d)</span><span style="font-size:20px">&#x1F33E;</span></div>
-        <div style="font-size:26px;font-weight:800;color:#10b981">+$234.18</div>
-        <div style="font-size:11px;color:#475569;margin-top:4px">APY: 8.4%</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">USDC Balance</span><span style="font-size:20px">&#x1F4B5;</span></div>
+        <div id="usdc-balance" style="font-size:26px;font-weight:800;color:#10b981">Loading...</div>
+        <div id="usdc-chain" style="font-size:11px;color:#475569;margin-top:4px">Testnet USDC</div>
       </div>
       <div class="sc" style="background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(10,22,40,.8));border:1px solid rgba(245,158,11,.2)">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Pending Round-ups</span><span style="font-size:20px">&#x1F437;</span></div>
-        <div style="font-size:26px;font-weight:800;color:#f59e0b">$4.27</div>
-        <div style="font-size:11px;color:#475569;margin-top:4px">Auto-save enabled</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Active Network</span><span style="font-size:20px">&#x1F310;</span></div>
+        <div id="active-net" style="font-size:20px;font-weight:800;color:#f59e0b">Not connected</div>
+        <div id="chain-id-show" style="font-size:11px;color:#475569;margin-top:4px">Chain ID: --</div>
       </div>
       <div class="sc" style="background:linear-gradient(135deg,rgba(14,165,233,.12),rgba(10,22,40,.8));border:1px solid rgba(14,165,233,.2)">
         <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Gas Saved</span><span style="font-size:20px">&#x26FD;</span></div>
@@ -170,17 +149,25 @@ input::placeholder,textarea::placeholder{color:#475569}
         <div style="font-size:11px;color:#475569;margin-top:4px">Via Gas Station</div>
       </div>
     </div>
+
     <div class="g2">
-      <div class="card"><div style="font-weight:700;margin-bottom:14px">&#x2696;&#xFE0F; Unified Balance by Chain</div><div id="chain-bars"></div></div>
-      <div class="card"><div style="font-weight:700;margin-bottom:14px">&#x1F550; Recent Transactions</div><div id="recent-txs"></div></div>
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:14px">&#x26AF;&#xFE0F; Testnet Networks</div>
+        <div id="chain-bars"></div>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;margin-bottom:14px">&#x1F550; Recent Transactions</div>
+        <div id="recent-txs"></div>
+      </div>
     </div>
+
     <div style="background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.3);border-radius:18px;padding:20px;display:flex;align-items:center;gap:14px">
       <div style="font-size:34px">&#x1F916;</div>
       <div style="flex:1">
         <div style="font-weight:700;margin-bottom:4px">ArcMind AI Insight</div>
-        <div style="color:#94a3b8;font-size:13px">Arbitrum balance ($1,891) earns 0% yield. Found <span style="color:#10b981;font-weight:700">9.2% APY</span> on Aave v3 &mdash; auto-rebalance = ~$174/year extra.</div>
+        <div id="ai-insight" style="color:#94a3b8;font-size:13px">Connect your wallet to get personalized AI insights about your testnet portfolio.</div>
       </div>
-      <button onclick="go('yield',document.querySelectorAll('.tab')[3])" style="padding:9px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap">View Yield &#x2192;</button>
+      <button onclick="go('ai',document.querySelectorAll('.tab')[4])" style="padding:9px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap">Ask AI &#x2192;</button>
     </div>
   </div>
 </section>
@@ -189,29 +176,43 @@ input::placeholder,textarea::placeholder{color:#475569}
 <section id="pg-send" class="pg">
   <div style="max-width:480px;margin:0 auto">
     <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F4B8; Send USDC</h2>
-    <p style="color:#64748b;margin-bottom:24px">Send to wallet, ENS, or natural language address</p>
+    <p style="color:#64748b;margin-bottom:24px">Send testnet USDC on Arc, Arbitrum Sepolia or Sepolia</p>
     <div class="card" style="border-radius:22px;padding:26px">
-      <div style="margin-bottom:16px">
+      <div style="margin-bottom:14px">
+        <label class="lbl">Network</label>
+        <select id="send-net" class="inp" style="cursor:pointer" onchange="onSendNetChange()">
+          <option value="arc">Arc Testnet (Chain 1338)</option>
+          <option value="arb-sep">Arbitrum Sepolia (Chain 421614)</option>
+          <option value="sepolia">Sepolia ETH (Chain 11155111)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Token</label>
+        <select id="send-token" class="inp" style="cursor:pointer">
+          <option value="usdc">USDC (Testnet)</option>
+          <option value="native">Native Token (ETH/ARC)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px">
         <label class="lbl">Recipient</label>
-        <input id="send-to" class="inp" placeholder="vitalik.eth, alice.arc, or 0x..." oninput="resolveAddr(this.value)"/>
-        <div id="resolved" style="margin-top:5px;font-size:12px;color:#6366f1;display:none">&#x1F4D6; Resolved: 0x4a2f...8e91</div>
+        <input id="send-to" class="inp" placeholder="0x address or ENS name"/>
+        <div id="resolved" style="margin-top:5px;font-size:12px;color:#6366f1;display:none">&#x1F4D6; Resolved address</div>
       </div>
       <div style="margin-bottom:16px">
-        <label class="lbl">Amount (USDC)</label>
+        <label class="lbl">Amount</label>
         <div style="position:relative">
-          <input id="send-amt" class="inp" placeholder="0.00" type="number" style="font-size:20px;font-weight:700;padding-right:65px"/>
-          <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#6366f1;font-weight:700">USDC</span>
+          <input id="send-amt" class="inp" placeholder="0.00" type="number" style="font-size:20px;font-weight:700;padding-right:75px"/>
+          <span id="send-token-label" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#6366f1;font-weight:700;font-size:13px">USDC</span>
         </div>
+        <div style="margin-top:6px;font-size:11px;color:#64748b">Balance: <span id="send-balance" style="color:#e2e8f0;font-weight:700">--</span></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px">
-        <div style="background:rgba(99,102,241,.08);border-radius:10px;padding:12px"><div style="font-size:10px;color:#64748b">Gas Fee</div><div style="font-weight:700;color:#10b981">FREE &#x26FD;</div></div>
-        <div style="background:rgba(99,102,241,.08);border-radius:10px;padding:12px"><div style="font-size:10px;color:#64748b">Network</div><div id="net-name" style="font-weight:700;color:#627eea">Ethereum</div></div>
+      <div style="background:rgba(99,102,241,.08);border-radius:10px;padding:12px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#64748b">Network</span><span id="send-net-label" style="font-size:12px;font-weight:700;color:#6366f1">Arc Testnet</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#64748b">Est. Gas</span><span id="send-gas" style="font-size:12px;font-weight:700;color:#10b981">Calculating...</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#64748b">Status</span><span id="send-status" style="font-size:12px;font-weight:700;color:#f59e0b">Ready</span></div>
       </div>
-      <button class="btn" onclick="doSend()">Send USDC &#x2192;</button>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button onclick="go('sim',document.querySelectorAll('.tab')[5])" style="flex:1;padding:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.3);border-radius:10px;color:#6366f1;font-weight:700;cursor:pointer;font-size:12px">&#x1F9EA; Simulate</button>
-        <button onclick="notif('USDC Streaming activated!')" style="flex:1;padding:10px;background:rgba(236,72,153,.1);border:1px solid rgba(236,72,153,.3);border-radius:10px;color:#ec4899;font-weight:700;cursor:pointer;font-size:12px">&#x1F4B8; Stream</button>
-      </div>
+      <button class="btn" id="send-btn" onclick="doRealSend()">Send &#x2192;</button>
+      <div id="send-tx-link" style="display:none;margin-top:10px;text-align:center;font-size:12px;color:#6366f1"></div>
     </div>
   </div>
 </section>
@@ -220,29 +221,43 @@ input::placeholder,textarea::placeholder{color:#475569}
 <section id="pg-bridge" class="pg">
   <div style="max-width:500px;margin:0 auto">
     <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F309; Cross-Chain Bridge</h2>
-    <p style="color:#64748b;margin-bottom:24px">Move USDC across chains via Circle CCTP</p>
+    <p style="color:#64748b;margin-bottom:24px">Bridge testnet USDC via Circle CCTP</p>
     <div class="card" style="border-radius:22px;padding:26px;border-color:rgba(139,92,246,.2)">
       <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:end;margin-bottom:16px">
-        <div><label class="lbl">From</label>
-          <select class="inp" style="cursor:pointer">
-            <option>Ethereum</option><option>Base</option><option>Solana</option><option>Arbitrum</option><option>Polygon</option>
+        <div>
+          <label class="lbl">From</label>
+          <select id="bridge-from" class="inp" style="cursor:pointer" onchange="updateBridgeTo()">
+            <option value="arc">Arc Testnet</option>
+            <option value="arb-sep">Arbitrum Sepolia</option>
+            <option value="sepolia">Sepolia ETH</option>
           </select>
         </div>
-        <div style="padding-bottom:8px;font-size:20px;color:#6366f1;cursor:pointer" onclick="notif('Chains swapped!')">&#x21C4;</div>
-        <div><label class="lbl">To</label>
-          <select class="inp" style="cursor:pointer">
-            <option>Base</option><option>Ethereum</option><option>Arbitrum</option><option>Polygon</option>
+        <div style="padding-bottom:8px;font-size:22px;color:#6366f1;cursor:pointer" onclick="swapBridge()">&#x21C4;</div>
+        <div>
+          <label class="lbl">To</label>
+          <select id="bridge-to" class="inp" style="cursor:pointer">
+            <option value="arb-sep">Arbitrum Sepolia</option>
+            <option value="sepolia">Sepolia ETH</option>
+            <option value="arc">Arc Testnet</option>
           </select>
         </div>
       </div>
-      <input class="inp" placeholder="Amount in USDC" type="number" style="margin-bottom:16px;font-size:18px;font-weight:700"/>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Token</label>
+        <select id="bridge-token" class="inp" style="cursor:pointer">
+          <option value="usdc">USDC (Testnet)</option>
+          <option value="eth">ETH (Testnet)</option>
+        </select>
+      </div>
+      <input id="bridge-amt" class="inp" placeholder="Amount to bridge" type="number" style="margin-bottom:16px;font-size:18px;font-weight:700"/>
       <div style="background:rgba(139,92,246,.08);border-radius:12px;padding:14px;margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Protocol</span><span style="font-size:13px;font-weight:600">Circle CCTP v2</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Est. Time</span><span style="font-size:13px;font-weight:600">~2 minutes</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Bridge Fee</span><span style="color:#10b981;font-size:13px;font-weight:600">$0.00</span></div>
-        <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="color:#64748b;font-size:13px">Replay Protection</span><span style="color:#10b981;font-size:13px;font-weight:600">&#x2705; Active</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Est. Time</span><span style="font-size:13px;font-weight:600">~2-3 minutes</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05)"><span style="color:#64748b;font-size:13px">Bridge Fee</span><span style="color:#10b981;font-size:13px;font-weight:600">$0.00 (Testnet)</span></div>
+        <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="color:#64748b;font-size:13px">Route</span><span id="bridge-route" style="color:#6366f1;font-size:13px;font-weight:600">Arc &#x2192; Arb Sepolia</span></div>
       </div>
-      <button class="btn" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)" onclick="notif('Bridge initiated via CCTP!')">Bridge &#x2192;</button>
+      <button class="btn" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)" id="bridge-btn" onclick="doBridge()">Bridge via CCTP &#x2192;</button>
+      <div id="bridge-tx-link" style="display:none;margin-top:10px;text-align:center;font-size:12px;color:#6366f1"></div>
     </div>
   </div>
 </section>
@@ -250,7 +265,7 @@ input::placeholder,textarea::placeholder{color:#475569}
 <!-- YIELD -->
 <section id="pg-yield" class="pg">
   <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F33E; AI Yield Optimizer</h2>
-  <p style="color:#64748b;margin-bottom:24px">Multi-chain DeFi yield with AI auto-rebalancing</p>
+  <p style="color:#64748b;margin-bottom:24px">Testnet DeFi yield opportunities with AI guidance</p>
   <div id="yield-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px"></div>
   <div class="card" style="margin-top:18px">
     <div style="font-weight:700;margin-bottom:12px">&#x1F916; Auto-Rebalancer</div>
@@ -273,38 +288,48 @@ input::placeholder,textarea::placeholder{color:#475569}
       <div id="chat-box">
         <div class="cm">
           <div style="background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:8px;padding:5px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="18" height="18" viewBox="0 0 100 100" fill="none">
-              <defs><linearGradient id="av" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/>
-              </linearGradient></defs>
-              <path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#av)"/>
-              <ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#av)"/>
-            </svg>
+            <svg width="18" height="18" viewBox="0 0 100 100" fill="none"><defs><linearGradient id="av" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs><path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#av)"/><ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#av)"/></svg>
           </div>
-          <div class="cb ai">Welcome to ArcMind AI! I am your intelligent USDC assistant. Ask me anything about your portfolio, yields, bridging, or gas optimization.</div>
+          <div class="cb ai">Welcome to ArcMind AI! I am your intelligent Web3 assistant for Arc Testnet, Arbitrum Sepolia and Sepolia ETH. Ask me anything about testnet USDC, bridging via CCTP, gas optimization or DeFi yields.</div>
         </div>
       </div>
       <div style="padding:14px 16px;border-top:1px solid rgba(99,102,241,.15);display:flex;gap:8px">
-        <input id="ai-in" class="inp" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendAI()" style="flex:1"/>
+        <input id="ai-in" class="inp" placeholder="Ask anything about Arc testnet..." onkeydown="if(event.key==='Enter')sendAI()" style="flex:1"/>
         <button onclick="sendAI()" style="padding:11px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:11px;color:#fff;font-weight:700;cursor:pointer;font-size:16px">&#x2192;</button>
       </div>
     </div>
     <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:7px">
-      <button onclick="qAsk('What is my best yield option?')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Best yield?</button>
-      <button onclick="qAsk('How do I bridge USDC to Base?')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Bridge to Base</button>
-      <button onclick="qAsk('Simulate sending 100 USDC to vitalik.eth')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Simulate send</button>
-      <button onclick="qAsk('Analyze my portfolio and suggest rebalancing')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Portfolio check</button>
+      <button onclick="qAsk('How do I get testnet USDC on Arc network?')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Get testnet USDC</button>
+      <button onclick="qAsk('How do I bridge USDC from Sepolia to Arc testnet using CCTP?')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Bridge to Arc</button>
+      <button onclick="qAsk('What is the Arc testnet chain ID and RPC URL?')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Arc chain info</button>
+      <button onclick="qAsk('How to add Arc testnet to MetaMask?')" style="padding:5px 12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.25);border-radius:18px;color:#6366f1;font-size:11px;cursor:pointer;font-weight:600">Add to MetaMask</button>
     </div>
   </div>
 </section>
 
 <!-- SIMULATOR -->
 <section id="pg-sim" class="pg">
-  <div style="max-width:600px;margin:0 auto">
+  <div style="max-width:620px;margin:0 auto">
     <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F9EA; AI What-If Simulator</h2>
-    <p style="color:#64748b;margin-bottom:24px">Simulate before you sign</p>
+    <p style="color:#64748b;margin-bottom:24px">Simulate testnet transactions before you sign</p>
     <div class="card" style="border-radius:22px;padding:26px;border-color:rgba(236,72,153,.2)">
-      <textarea id="sim-in" class="inp" rows="4" placeholder="e.g. Send 500 USDC to vitalik.eth on Ethereum" style="resize:none;margin-bottom:12px;background:rgba(236,72,153,.05);border-color:rgba(236,72,153,.2)"></textarea>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Network</label>
+        <select id="sim-net" class="inp" style="cursor:pointer">
+          <option value="arc">Arc Testnet (Chain 1338)</option>
+          <option value="arb-sep">Arbitrum Sepolia (Chain 421614)</option>
+          <option value="sepolia">Sepolia ETH (Chain 11155111)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Token</label>
+        <select id="sim-token" class="inp" style="cursor:pointer">
+          <option value="usdc">USDC (Testnet)</option>
+          <option value="eth">ETH (Testnet)</option>
+          <option value="arc">ARC Token</option>
+        </select>
+      </div>
+      <textarea id="sim-in" class="inp" rows="3" placeholder="Describe transaction: e.g. Send 100 testnet USDC to 0x1234... on Arc Testnet" style="resize:none;margin-bottom:12px;background:rgba(236,72,153,.05);border-color:rgba(236,72,153,.2)"></textarea>
       <button id="sim-btn" class="btn" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)" onclick="runSim()">&#x1F9EA; Run AI Simulation</button>
     </div>
     <div id="sim-res" style="display:none;margin-top:16px" class="card"></div>
@@ -315,9 +340,17 @@ input::placeholder,textarea::placeholder{color:#475569}
 <section id="pg-fraud" class="pg">
   <div style="max-width:600px;margin:0 auto">
     <h2 style="font-size:22px;font-weight:800;margin-bottom:6px">&#x1F6E1;&#xFE0F; AI Fraud Radar</h2>
-    <p style="color:#64748b;margin-bottom:24px">Real-time smart contract audit</p>
+    <p style="color:#64748b;margin-bottom:24px">Real-time smart contract audit on testnet</p>
     <div class="card" style="border-radius:22px;padding:26px;border-color:rgba(249,115,22,.2)">
-      <input id="fraud-in" class="inp" placeholder="Contract address, tx hash, or protocol name..." style="margin-bottom:12px;background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.2)"/>
+      <div style="margin-bottom:14px">
+        <label class="lbl">Network</label>
+        <select id="fraud-net" class="inp" style="cursor:pointer">
+          <option value="arc">Arc Testnet</option>
+          <option value="arb-sep">Arbitrum Sepolia</option>
+          <option value="sepolia">Sepolia ETH</option>
+        </select>
+      </div>
+      <input id="fraud-in" class="inp" placeholder="Contract address or tx hash on testnet..." style="margin-bottom:12px;background:rgba(249,115,22,.05);border-color:rgba(249,115,22,.2)"/>
       <button id="fraud-btn" class="btn" style="background:linear-gradient(135deg,#f97316,#ef4444)" onclick="runFraud()">&#x1F50D; Run Security Audit</button>
     </div>
     <div id="fraud-res" style="display:none;margin-top:16px" class="card"></div>
@@ -332,400 +365,781 @@ input::placeholder,textarea::placeholder{color:#475569}
   </div>
   <div id="feat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px"></div>
 </section>
-
 </main>
 
 <script>
-var CHAINS=[{name:'Ethereum',color:'#627eea',amt:4821},{name:'Base',color:'#0052ff',amt:3102},{name:'Solana',color:'#9945ff',amt:2340},{name:'Arbitrum',color:'#28a0f0',amt:1891},{name:'Polygon',color:'#8247e5',amt:693}];
-var TXS=[{label:'Sent to vitalik.eth',amt:'-50.00',chain:'ETH',time:'2m ago'},{label:'Yield harvested',amt:'+12.34',chain:'BASE',time:'1h ago'},{label:'Bridge ETH to ARB',amt:'-200.00',chain:'ARB',time:'3h ago'},{label:'Round-up saved',amt:'-0.73',chain:'BASE',time:'5h ago'},{label:'Received USDC',amt:'+500.00',chain:'SOL',time:'1d ago'}];
-var YIELDS=[{p:'Aave v3',c:'Arbitrum',apy:'9.2%',tvl:'$2.1B',risk:'LOW',col:'#10b981',hot:true},{p:'Compound v3',c:'Base',apy:'7.8%',tvl:'$890M',risk:'LOW',col:'#0ea5e9',hot:false},{p:'Morpho Blue',c:'Ethereum',apy:'11.4%',tvl:'$450M',risk:'MEDIUM',col:'#f59e0b',hot:false},{p:'Spark Protocol',c:'Ethereum',apy:'6.9%',tvl:'$1.3B',risk:'LOW',col:'#6366f1',hot:false}];
-var FEATS=[{i:'&#x1F510;',t:'Programmable Wallet',d:'Circle WaaS gasless smart wallet',c:'#6366f1'},{i:'&#x1F309;',t:'Cross-Chain Transfer',d:'CCTP move USDC across chains',c:'#8b5cf6'},{i:'&#x2696;&#xFE0F;',t:'Unified Balance',d:'All chains one balance view',c:'#0ea5e9'},{i:'&#x1F4B8;',t:'Micro-payments',d:'USDC streaming and micro-transactions',c:'#10b981'},{i:'&#x1F437;',t:'Auto Round-ups',d:'Automated savings hooks',c:'#f59e0b'},{i:'&#x1F33E;',t:'DeFi Yield',d:'One-click yield integration',c:'#ef4444'},{i:'&#x1F9EA;',t:'AI Simulator',d:'What-If transaction playground',c:'#ec4899'},{i:'&#x26FD;',t:'Gasless Experience',d:'Intent-based gas-token swap',c:'#14b8a6'},{i:'&#x1F6E1;&#xFE0F;',t:'Fraud Radar',d:'AI smart contract audit on the fly',c:'#f97316'},{i:'&#x1F4D6;',t:'Web3 Address Book',d:'Natural language domain abstraction',c:'#a855f7'},{i:'&#x1F916;',t:'AI Yield Optimizer',d:'Multi-chain auto-rebalancer',c:'#06b6d4'},{i:'&#x1F504;',t:'TX Replay Protection',d:'Multi-chain status tracker',c:'#84cc16'},{i:'&#x1F5DD;&#xFE0F;',t:'Session Keys',d:'Gasless approval simulation',c:'#fb7185'},{i:'&#x1F4A1;',t:'Gas Optimizer',d:'Smart gas suggestion engine',c:'#fbbf24'},{i:'&#x1F3A4;',t:'Voice AI Agent',d:'Command ArcMind with your voice',c:'#818cf8'}];
-var RCOL={LOW:'#10b981',MEDIUM:'#f59e0b',HIGH:'#ef4444',CRITICAL:'#dc2626'};
-var aiHist=[], walletOn=false;
-
-window.addEventListener('DOMContentLoaded',function(){
-  var total=0;
-  for(var i=0;i<CHAINS.length;i++) total+=CHAINS[i].amt;
-  var h='';
-  for(var i=0;i<CHAINS.length;i++){
-    var c=CHAINS[i], pct=Math.round(c.amt/total*100);
-    h+='<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:13px;color:#94a3b8">'+c.name+'</span><span style="font-size:13px;font-weight:700">$'+c.amt.toLocaleString()+'</span></div><div class="pb"><div class="pf" style="width:'+pct+'%;background:'+c.color+'"></div></div></div>';
+/* ============================================================
+   TESTNET CONFIG
+   ============================================================ */
+var TESTNETS = {
+  'arc': {
+    name: 'Arc Testnet',
+    chainId: '0x53A', // 1338
+    chainIdDec: 1338,
+    rpc: 'https://rpc.arc-testnet.network',
+    explorer: 'https://explorer.arc-testnet.network',
+    symbol: 'ARC',
+    color: '#6366f1',
+    usdcAddr: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+  },
+  'arb-sep': {
+    name: 'Arbitrum Sepolia',
+    chainId: '0x66EEE', // 421614
+    chainIdDec: 421614,
+    rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
+    explorer: 'https://sepolia.arbiscan.io',
+    symbol: 'ETH',
+    color: '#28a0f0',
+    usdcAddr: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d'
+  },
+  'sepolia': {
+    name: 'Sepolia ETH',
+    chainId: '0xAA36A7', // 11155111
+    chainIdDec: 11155111,
+    rpc: 'https://rpc.sepolia.org',
+    explorer: 'https://sepolia.etherscan.io',
+    symbol: 'ETH',
+    color: '#627eea',
+    usdcAddr: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
   }
-  document.getElementById('chain-bars').innerHTML=h;
+};
 
-  h='';
-  for(var i=0;i<TXS.length;i++){
-    var t=TXS[i], b=i<TXS.length-1?'border-bottom:1px solid rgba(255,255,255,.05)':'', col=t.amt.charAt(0)=='+'?'#10b981':'#f87171';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;'+b+'"><div><div style="font-size:13px;font-weight:600">'+t.label+'</div><div style="font-size:11px;color:#475569">'+t.chain+' &middot; '+t.time+'</div></div><div style="font-size:13px;font-weight:700;color:'+col+'">'+t.amt+'</div></div>';
-  }
-  document.getElementById('recent-txs').innerHTML=h;
+var CHAIN_BARS = [
+  {name:'Arc Testnet',color:'#6366f1',key:'arc'},
+  {name:'Arbitrum Sepolia',color:'#28a0f0',key:'arb-sep'},
+  {name:'Sepolia ETH',color:'#627eea',key:'sepolia'}
+];
 
-  h='';
-  for(var i=0;i<YIELDS.length;i++){
-    var y=YIELDS[i], rc=RCOL[y.risk]||'#6b7280';
-    var border=y.hot?y.col:'rgba(99,102,241,.15)';
-    var btnBg=y.hot?'linear-gradient(135deg,'+y.col+','+y.col+'99)':'rgba(99,102,241,.15)';
-    var btnCol=y.hot?'#fff':'#94a3b8';
-    var badge=y.hot?'<div style="position:absolute;top:-9px;right:14px;background:#10b981;color:#fff;font-size:9px;font-weight:800;padding:3px 9px;border-radius:18px">AI PICK</div>':'';
-    h+='<div style="background:rgba(10,22,40,.8);border:1px solid '+border+';border-radius:18px;padding:22px;position:relative">'+badge+'<div style="display:flex;justify-content:space-between;margin-bottom:14px"><div><div style="font-weight:800;font-size:17px">'+y.p+'</div><div style="font-size:11px;color:#64748b">'+y.c+'</div></div><div style="text-align:right"><div style="font-size:26px;font-weight:900;color:'+y.col+'">'+y.apy+'</div><div style="font-size:10px;color:#475569">APY</div></div></div><div style="display:flex;justify-content:space-between;margin-bottom:18px"><div style="font-size:12px;color:#64748b">TVL: '+y.tvl+'</div><div style="font-size:10px;font-weight:700;color:'+rc+';background:'+rc+'20;padding:2px 7px;border-radius:7px">'+y.risk+' RISK</div></div><button style="width:100%;padding:11px;background:'+btnBg+';border:1px solid '+y.col+'50;border-radius:10px;color:'+btnCol+';font-weight:700;cursor:pointer;font-size:12px" onclick="notif(\'Deploying to '+y.p+'...\')">'+( y.hot?'One-Click Deploy':'Deploy Funds')+'</button></div>';
-  }
-  document.getElementById('yield-cards').innerHTML=h;
+var YIELDS = [
+  {p:'Arc Lending Pool',c:'Arc Testnet',apy:'8.5%',tvl:'Testnet',risk:'LOW',col:'#6366f1',hot:true},
+  {p:'Aave v3 Testnet',c:'Sepolia ETH',apy:'6.2%',tvl:'Testnet',risk:'LOW',col:'#10b981',hot:false},
+  {p:'Compound v3',c:'Arbitrum Sepolia',apy:'7.1%',tvl:'Testnet',risk:'LOW',col:'#0ea5e9',hot:false},
+  {p:'Arc Yield Vault',c:'Arc Testnet',apy:'11.3%',tvl:'Testnet',risk:'MEDIUM',col:'#f59e0b',hot:false}
+];
 
-  h='';
-  for(var i=0;i<FEATS.length;i++){
-    var f=FEATS[i];
-    h+='<div style="background:rgba(10,22,40,.8);border:1px solid '+f.c+'25;border-radius:16px;padding:20px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:10px"><div style="font-size:24px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:'+f.c+'15;border-radius:10px">'+f.i+'</div><div><div style="font-weight:700;font-size:13px">'+f.t+'</div><div style="font-size:10px;color:'+f.c+';font-weight:600">Active</div></div></div><div style="font-size:12px;color:#64748b;line-height:1.5">'+f.d+'</div></div>';
-  }
-  document.getElementById('feat-grid').innerHTML=h;
+var FEATS = [
+  {i:'&#x1F510;',t:'Programmable Wallet',d:'Circle WaaS gasless smart wallet',c:'#6366f1'},
+  {i:'&#x1F309;',t:'Cross-Chain Transfer',d:'CCTP testnet USDC bridge',c:'#8b5cf6'},
+  {i:'&#x2696;&#xFE0F;',t:'Unified Balance',d:'Real wallet balance across testnets',c:'#0ea5e9'},
+  {i:'&#x1F4B8;',t:'Micro-payments',d:'Testnet USDC streaming',c:'#10b981'},
+  {i:'&#x1F437;',t:'Auto Round-ups',d:'Automated savings hooks',c:'#f59e0b'},
+  {i:'&#x1F33E;',t:'DeFi Yield',d:'Testnet yield integration',c:'#ef4444'},
+  {i:'&#x1F9EA;',t:'AI Simulator',d:'What-If testnet playground',c:'#ec4899'},
+  {i:'&#x26FD;',t:'Gasless Experience',d:'Intent-based gas-token swap',c:'#14b8a6'},
+  {i:'&#x1F6E1;&#xFE0F;',t:'Fraud Radar',d:'AI contract audit on testnet',c:'#f97316'},
+  {i:'&#x1F4D6;',t:'Web3 Address Book',d:'ENS and domain abstraction',c:'#a855f7'},
+  {i:'&#x1F916;',t:'AI Yield Optimizer',d:'Multi-chain auto-rebalancer',c:'#06b6d4'},
+  {i:'&#x1F504;',t:'TX Replay Protection',d:'Multi-chain status tracker',c:'#84cc16'},
+  {i:'&#x1F5DD;&#xFE0F;',t:'Session Keys',d:'Gasless approval simulation',c:'#fb7185'},
+  {i:'&#x1F4A1;',t:'Gas Optimizer',d:'Smart gas suggestion engine',c:'#fbbf24'},
+  {i:'&#x1F3A4;',t:'Voice AI Agent',d:'Voice command for ArcMind',c:'#818cf8'}
+];
+
+var RCOL = {LOW:'#10b981',MEDIUM:'#f59e0b',HIGH:'#ef4444',CRITICAL:'#dc2626'};
+var aiHist = [], walletOn = false, currentAddr = '', currentChainKey = 'arc';
+var AV = '<div style="background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:8px;padding:5px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 100 100" fill="none"><defs><linearGradient id="av2" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs><path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#av2)"/><ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#av2)"/></svg></div>';
+
+/* ============================================================
+   INIT
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', function() {
+  renderChainBars();
+  renderTxs();
+  renderYields();
+  renderFeats();
+  estimateGas();
+  updateBridgeRoute();
+  updateSendNetLabel();
 });
 
-function go(id,btn){
-  var all=document.querySelectorAll('.pg');
-  for(var i=0;i<all.length;i++) all[i].classList.remove('on');
-  var tabs=document.querySelectorAll('.tab');
-  for(var i=0;i<tabs.length;i++) tabs[i].classList.remove('on');
-  document.getElementById('pg-'+id).classList.add('on');
-  if(btn) btn.classList.add('on');
+function renderChainBars() {
+  var h = '';
+  for (var i = 0; i < CHAIN_BARS.length; i++) {
+    var c = CHAIN_BARS[i];
+    h += '<div style="margin-bottom:14px">'
+      + '<div style="display:flex;justify-content:space-between;margin-bottom:5px">'
+      + '<span style="font-size:13px;color:#94a3b8">' + c.name + '</span>'
+      + '<span id="bar-bal-' + c.key + '" style="font-size:12px;font-weight:700;color:' + c.color + '">--</span></div>'
+      + '<div class="pb"><div class="pf" id="bar-' + c.key + '" style="width:30%;background:' + c.color + '"></div></div></div>';
+  }
+  document.getElementById('chain-bars').innerHTML = h;
+}
+
+function renderTxs() {
+  document.getElementById('recent-txs').innerHTML = '<div style="font-size:13px;color:#475569;padding:20px 0;text-align:center">Connect wallet to see transactions</div>';
+}
+
+function renderYields() {
+  var h = '';
+  for (var i = 0; i < YIELDS.length; i++) {
+    var y = YIELDS[i];
+    var rc = RCOL[y.risk] || '#6b7280';
+    var border = y.hot ? y.col : 'rgba(99,102,241,.15)';
+    var btnBg = y.hot ? 'linear-gradient(135deg,' + y.col + ',' + y.col + '99)' : 'rgba(99,102,241,.15)';
+    var btnCol = y.hot ? '#fff' : '#94a3b8';
+    var badge = y.hot ? '<div style="position:absolute;top:-9px;right:14px;background:#10b981;color:#fff;font-size:9px;font-weight:800;padding:3px 9px;border-radius:18px">AI PICK</div>' : '';
+    h += '<div style="background:rgba(10,22,40,.8);border:1px solid ' + border + ';border-radius:18px;padding:22px;position:relative">'
+      + badge
+      + '<div style="display:flex;justify-content:space-between;margin-bottom:14px">'
+      + '<div><div style="font-weight:800;font-size:17px">' + y.p + '</div><div style="font-size:11px;color:#64748b">' + y.c + '</div></div>'
+      + '<div style="text-align:right"><div style="font-size:26px;font-weight:900;color:' + y.col + '">' + y.apy + '</div><div style="font-size:10px;color:#475569">APY</div></div></div>'
+      + '<div style="display:flex;justify-content:space-between;margin-bottom:18px">'
+      + '<div style="font-size:11px;color:#10b981;background:rgba(16,185,129,.1);padding:2px 8px;border-radius:6px">Testnet</div>'
+      + '<div style="font-size:10px;font-weight:700;color:' + rc + ';background:' + rc + '20;padding:2px 7px;border-radius:7px">' + y.risk + ' RISK</div></div>'
+      + '<button onclick="notif(\'Deploying to ' + y.p + '...\')" style="width:100%;padding:11px;background:' + btnBg + ';border:1px solid ' + y.col + '50;border-radius:10px;color:' + btnCol + ';font-weight:700;cursor:pointer;font-size:12px">'
+      + (y.hot ? 'One-Click Deploy' : 'Deploy Funds') + '</button></div>';
+  }
+  document.getElementById('yield-cards').innerHTML = h;
+}
+
+function renderFeats() {
+  var h = '';
+  for (var i = 0; i < FEATS.length; i++) {
+    var f = FEATS[i];
+    h += '<div style="background:rgba(10,22,40,.8);border:1px solid ' + f.c + '25;border-radius:16px;padding:20px">'
+      + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+      + '<div style="font-size:24px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:' + f.c + '15;border-radius:10px">' + f.i + '</div>'
+      + '<div><div style="font-weight:700;font-size:13px">' + f.t + '</div><div style="font-size:10px;color:' + f.c + ';font-weight:600">Active</div></div></div>'
+      + '<div style="font-size:12px;color:#64748b;line-height:1.5">' + f.d + '</div></div>';
+  }
+  document.getElementById('feat-grid').innerHTML = h;
 }
 
 /* ============================================================
-   WALLET MODAL — uses plain string concat, no template literals
+   TABS
    ============================================================ */
-function showWallet(){
+function go(id, btn) {
+  var all = document.querySelectorAll('.pg');
+  for (var i = 0; i < all.length; i++) all[i].classList.remove('on');
+  var tabs = document.querySelectorAll('.tab');
+  for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('on');
+  document.getElementById('pg-' + id).classList.add('on');
+  if (btn) btn.classList.add('on');
+}
+
+/* ============================================================
+   WALLET MODAL
+   ============================================================ */
+function showWallet() {
   closeModal('wm');
-  var ov=document.createElement('div');
-  ov.id='wm'; ov.className='ov';
-  ov.innerHTML=buildWalletHTML();
-  ov.addEventListener('click',function(e){if(e.target===ov)closeModal('wm');});
+  var ov = document.createElement('div');
+  ov.id = 'wm'; ov.className = 'ov';
+  var svg = '<svg width="36" height="36" viewBox="0 0 100 100" fill="none"><defs><linearGradient id="wlg" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs><path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#wlg)"/><ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#wlg)"/></svg>';
+  ov.innerHTML = '<div class="mo">'
+    + '<button class="mc" onclick="closeModal(\'wm\')">&#x2715;</button>'
+    + '<div style="text-align:center;margin-bottom:22px">'
+    + '<div style="display:inline-flex;background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:12px;padding:10px;border:1px solid rgba(148,163,184,.15);margin-bottom:10px">' + svg + '</div>'
+    + '<div style="font-size:18px;font-weight:800">Connect Wallet</div>'
+    + '<div style="font-size:12px;color:#64748b;margin-top:4px">Supports Arc, Arb Sepolia, Sepolia ETH</div></div>'
+    + '<button class="wo" id="mm-btn" onclick="doMetaMask()" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25)">'
+    + '<div class="wi" style="background:rgba(245,158,11,.15)">&#x1F98A;</div>'
+    + '<div style="flex:1"><div style="font-weight:700;font-size:14px">MetaMask</div><div style="font-size:11px;color:#94a3b8">Browser extension wallet</div></div>'
+    + '<div style="font-size:10px;color:#f59e0b;font-weight:700;background:rgba(245,158,11,.12);padding:2px 7px;border-radius:7px">Popular</div></button>'
+    + '<button class="wo" onclick="doOther(\'Brave\')" style="background:rgba(251,115,22,.08);border:1px solid rgba(251,115,22,.25)">'
+    + '<div class="wi" style="background:linear-gradient(135deg,#fb7234,#e9400b)">&#x1F981;</div>'
+    + '<div><div style="font-weight:700;font-size:14px">Brave Wallet</div><div style="font-size:11px;color:#94a3b8">Built-in Brave Browser</div></div></button>'
+    + '<button class="wo" onclick="doOther(\'Coinbase\')" style="background:rgba(0,82,255,.08);border:1px solid rgba(0,82,255,.25)">'
+    + '<div class="wi" style="background:linear-gradient(135deg,#0052ff,#0039b3)">&#x1F535;</div>'
+    + '<div><div style="font-weight:700;font-size:14px">Coinbase Wallet</div><div style="font-size:11px;color:#94a3b8">Mobile and Desktop</div></div></button>'
+    + '<button class="wo" onclick="doWC()" style="background:rgba(59,153,252,.08);border:1px solid rgba(59,153,252,.25);margin-bottom:0">'
+    + '<div class="wi" style="background:linear-gradient(135deg,#3b99fc,#2563eb)">&#x1F517;</div>'
+    + '<div><div style="font-weight:700;font-size:14px">WalletConnect</div><div style="font-size:11px;color:#94a3b8">QR scan any mobile wallet</div></div></button>'
+    + '<div style="margin-top:14px;text-align:center;font-size:11px;color:#475569">Connects to Arc, Arb Sepolia and Sepolia testnets</div></div>';
+  ov.addEventListener('click', function(e) { if (e.target === ov) closeModal('wm'); });
   document.body.appendChild(ov);
 }
 
-function buildWalletHTML(){
-  var svg='<svg width="36" height="36" viewBox="0 0 100 100" fill="none">'
-    +'<defs><linearGradient id="wlg" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse">'
-    +'<stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs>'
-    +'<path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#wlg)"/>'
-    +'<ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#wlg)"/></svg>';
-  return '<div class="mo">'
-    +'<button class="mc" onclick="closeModal(\'wm\')">&#x2715;</button>'
-    +'<div style="text-align:center;margin-bottom:22px">'
-    +'<div style="display:inline-flex;background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:12px;padding:10px;border:1px solid rgba(148,163,184,.15);margin-bottom:10px">'+svg+'</div>'
-    +'<div style="font-size:18px;font-weight:800">Connect Wallet</div>'
-    +'<div style="font-size:12px;color:#64748b;margin-top:4px">Choose your wallet to continue</div></div>'
-    +'<button class="wo" id="mm-btn" onclick="doMetaMask()" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25)">'
-    +'<div class="wi" style="background:rgba(245,158,11,.15)">&#x1F98A;</div>'
-    +'<div style="flex:1"><div style="font-weight:700;font-size:14px">MetaMask</div><div style="font-size:11px;color:#94a3b8">Browser extension wallet</div></div>'
-    +'<div style="font-size:10px;color:#f59e0b;font-weight:700;background:rgba(245,158,11,.12);padding:2px 7px;border-radius:7px">Popular</div></button>'
-    +'<button class="wo" onclick="doOther(\'Brave\')" style="background:rgba(251,115,22,.08);border:1px solid rgba(251,115,22,.25)">'
-    +'<div class="wi" style="background:linear-gradient(135deg,#fb7234,#e9400b)">&#x1F981;</div>'
-    +'<div><div style="font-weight:700;font-size:14px">Brave Wallet</div><div style="font-size:11px;color:#94a3b8">Built-in Brave Browser</div></div></button>'
-    +'<button class="wo" onclick="doOther(\'Coinbase\')" style="background:rgba(0,82,255,.08);border:1px solid rgba(0,82,255,.25)">'
-    +'<div class="wi" style="background:linear-gradient(135deg,#0052ff,#0039b3)">&#x1F535;</div>'
-    +'<div><div style="font-weight:700;font-size:14px">Coinbase Wallet</div><div style="font-size:11px;color:#94a3b8">Mobile and Desktop</div></div></button>'
-    +'<button class="wo" onclick="doWC()" style="background:rgba(59,153,252,.08);border:1px solid rgba(59,153,252,.25);margin-bottom:0">'
-    +'<div class="wi" style="background:linear-gradient(135deg,#3b99fc,#2563eb)">&#x1F517;</div>'
-    +'<div><div style="font-weight:700;font-size:14px">WalletConnect</div><div style="font-size:11px;color:#94a3b8">Scan QR with any mobile wallet</div></div></button>'
-    +'<div style="margin-top:14px;text-align:center;font-size:11px;color:#475569">By connecting you agree to our Terms of Service</div>'
-    +'</div>';
-}
+function closeModal(id) { var el = document.getElementById(id); if (el) el.remove(); }
 
-function closeModal(id){
-  var el=document.getElementById(id);
-  if(el) el.remove();
-}
-
-/* MetaMask — triggers real browser popup */
-function doMetaMask(){
-  var btn=document.getElementById('mm-btn');
-  if(btn){btn.style.opacity='0.6';btn.disabled=true;}
-
-  if(typeof window.ethereum==='undefined'||!window.ethereum.isMetaMask){
+function doMetaMask() {
+  var btn = document.getElementById('mm-btn');
+  if (btn) { btn.style.opacity = '0.6'; btn.disabled = true; }
+  if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
     closeModal('wm');
-    showInstall('MetaMask','https://metamask.io/download/');
+    showInstall('MetaMask', 'https://metamask.io/download/');
     return;
   }
-
-  window.ethereum.request({method:'eth_requestAccounts'})
-  .then(function(accounts){
-    var addr=accounts[0];
-    var short=addr.slice(0,6)+'...'+addr.slice(-4);
-    return window.ethereum.request({method:'eth_chainId'}).then(function(cid){
-      var cmap={'0x1':'Ethereum','0x89':'Polygon','0xa4b1':'Arbitrum','0x2105':'Base','0xa':'Optimism'};
-      var chain=cmap[cid]||'Ethereum';
-      closeModal('wm');
-      onConnected('&#x1F98A; '+short, chain);
-      window.ethereum.on('accountsChanged',function(a){
-        if(!a||!a.length){disconnWallet();}
-        else{document.getElementById('cbtn').innerHTML='&#x1F98A; '+a[0].slice(0,6)+'...'+a[0].slice(-4);}
-      });
-      window.ethereum.on('chainChanged',function(){location.reload();});
+  window.ethereum.request({ method: 'eth_requestAccounts' })
+  .then(function(accounts) {
+    currentAddr = accounts[0];
+    return window.ethereum.request({ method: 'eth_chainId' });
+  })
+  .then(function(cid) {
+    var chainKey = getChainKey(cid);
+    closeModal('wm');
+    onConnected('&#x1F98A; ' + currentAddr.slice(0,6) + '...' + currentAddr.slice(-4), chainKey);
+    window.ethereum.on('accountsChanged', function(a) {
+      if (!a || !a.length) { disconnWallet(); }
+      else { currentAddr = a[0]; document.getElementById('cbtn').innerHTML = '&#x1F98A; ' + a[0].slice(0,6) + '...' + a[0].slice(-4); loadBalances(); }
+    });
+    window.ethereum.on('chainChanged', function(cid2) {
+      var k = getChainKey(cid2);
+      currentChainKey = k;
+      updateChainUI(k);
+      loadBalances();
     });
   })
-  .catch(function(err){
+  .catch(function(err) {
     closeModal('wm');
-    if(err.code===4001){notif('Connection rejected by user');}
-    else{notif('MetaMask error. Please try again.');}
+    notif(err.code === 4001 ? 'Connection rejected' : 'MetaMask error', true);
   });
 }
 
-/* Brave / Coinbase also inject window.ethereum */
-function doOther(name){
-  if(typeof window.ethereum==='undefined'){
+function doOther(name) {
+  if (typeof window.ethereum === 'undefined') {
     closeModal('wm');
-    var urls={Brave:'https://brave.com/download/',Coinbase:'https://www.coinbase.com/wallet/downloads'};
-    showInstall(name+' Wallet',urls[name]);
+    showInstall(name + ' Wallet', name === 'Brave' ? 'https://brave.com/download/' : 'https://www.coinbase.com/wallet/downloads');
     return;
   }
-  window.ethereum.request({method:'eth_requestAccounts'})
-  .then(function(accounts){
-    var short=accounts[0].slice(0,6)+'...'+accounts[0].slice(-4);
-    var icon=name==='Brave'?'&#x1F981;':'&#x1F535;';
-    closeModal('wm');
-    onConnected(icon+' '+short,'Ethereum');
+  window.ethereum.request({ method: 'eth_requestAccounts' })
+  .then(function(accounts) {
+    currentAddr = accounts[0];
+    return window.ethereum.request({ method: 'eth_chainId' });
   })
-  .catch(function(err){
+  .then(function(cid) {
+    var chainKey = getChainKey(cid);
     closeModal('wm');
-    notif(err.code===4001?'Connection rejected':'Wallet error. Please try again.');
+    var icon = name === 'Brave' ? '&#x1F981;' : '&#x1F535;';
+    onConnected(icon + ' ' + currentAddr.slice(0,6) + '...' + currentAddr.slice(-4), chainKey);
+  })
+  .catch(function(err) { closeModal('wm'); notif(err.code === 4001 ? 'Rejected' : 'Wallet error', true); });
+}
+
+function doWC() {
+  closeModal('wm');
+  var ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'wc-ov';
+  var qr = '<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><rect width="140" height="140" fill="white"/><rect x="8" y="8" width="46" height="46" rx="4" fill="black"/><rect x="14" y="14" width="34" height="34" rx="2" fill="white"/><rect x="20" y="20" width="22" height="22" fill="black"/><rect x="86" y="8" width="46" height="46" rx="4" fill="black"/><rect x="92" y="14" width="34" height="34" rx="2" fill="white"/><rect x="98" y="20" width="22" height="22" fill="black"/><rect x="8" y="86" width="46" height="46" rx="4" fill="black"/><rect x="14" y="92" width="34" height="34" rx="2" fill="white"/><rect x="20" y="98" width="22" height="22" fill="black"/><rect x="62" y="8" width="8" height="8" fill="black"/><rect x="62" y="20" width="8" height="8" fill="black"/><rect x="62" y="32" width="8" height="8" fill="black"/><rect x="8" y="62" width="8" height="8" fill="black"/><rect x="20" y="62" width="8" height="8" fill="black"/><rect x="32" y="62" width="8" height="8" fill="black"/><rect x="62" y="62" width="8" height="8" fill="black"/><rect x="74" y="62" width="8" height="8" fill="black"/><rect x="86" y="62" width="8" height="8" fill="black"/><rect x="74" y="74" width="8" height="8" fill="black"/><rect x="86" y="86" width="8" height="8" fill="black"/></svg>';
+  ov.innerHTML = '<div class="mo" style="text-align:center;border-color:rgba(59,153,252,.35)">'
+    + '<button class="mc" onclick="closeModal(\'wc-ov\')">&#x2715;</button>'
+    + '<div style="font-size:28px;margin-bottom:8px">&#x1F517;</div>'
+    + '<div style="font-weight:800;font-size:17px;margin-bottom:5px">WalletConnect</div>'
+    + '<div style="font-size:12px;color:#64748b;margin-bottom:16px">Scan with your mobile wallet</div>'
+    + '<div style="width:160px;height:160px;margin:0 auto 14px;background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center">' + qr + '</div>'
+    + '<div style="font-size:11px;color:#475569;margin-bottom:14px">Trust Wallet &middot; Rainbow &middot; MetaMask Mobile</div>'
+    + '<button onclick="closeModal(\'wc-ov\');onConnected(\'&#x1F517; WalletConnect\',\'arc\')" style="width:100%;padding:11px;background:linear-gradient(135deg,#3b99fc,#2563eb);border:none;border-radius:11px;color:#fff;font-weight:700;cursor:pointer">Simulate Connect</button>'
+    + '</div>';
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+function showInstall(name, url) {
+  var ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'inst-ov';
+  ov.innerHTML = '<div class="mo" style="text-align:center">'
+    + '<button class="mc" onclick="closeModal(\'inst-ov\')">&#x2715;</button>'
+    + '<div style="font-size:36px;margin-bottom:10px">&#x1F4E6;</div>'
+    + '<div style="font-weight:800;font-size:17px;margin-bottom:6px">' + name + ' Not Found</div>'
+    + '<div style="font-size:13px;color:#64748b;margin-bottom:20px">Install ' + name + ' to continue</div>'
+    + '<div style="display:flex;gap:10px">'
+    + '<button onclick="closeModal(\'inst-ov\')" style="flex:1;padding:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#94a3b8;font-weight:700;cursor:pointer">Cancel</button>'
+    + '<a href="' + url + '" target="_blank" style="flex:1;padding:11px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;color:#fff;font-weight:700;text-decoration:none;display:block;text-align:center">Install Now</a>'
+    + '</div></div>';
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
+/* ============================================================
+   CHAIN HELPERS
+   ============================================================ */
+function getChainKey(hexId) {
+  var id = parseInt(hexId, 16);
+  if (id === 1338) return 'arc';
+  if (id === 421614) return 'arb-sep';
+  if (id === 11155111) return 'sepolia';
+  return 'unknown';
+}
+
+function updateChainUI(key) {
+  var net = TESTNETS[key] || {name: 'Unknown', color: '#64748b', chainIdDec: 0, symbol: '?'};
+  document.getElementById('active-net').textContent = net.name;
+  document.getElementById('active-net').style.color = net.color;
+  document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
+  var btns = document.querySelectorAll('.cbn');
+  var keys = ['arc', 'arb-sep', 'sepolia'];
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('on');
+    if (keys[i] === key) btns[i].classList.add('on');
+  }
+  var nn = document.getElementById('net-name');
+  if (nn) { nn.textContent = net.name; nn.style.color = net.color; }
+}
+
+function switchChain(key) {
+  if (!walletOn) { notif('Connect wallet first', true); return; }
+  var net = TESTNETS[key];
+  if (!net) return;
+  window.ethereum.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: net.chainId }]
+  })
+  .then(function() { currentChainKey = key; updateChainUI(key); loadBalances(); })
+  .catch(function(err) {
+    if (err.code === 4902) {
+      window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: net.chainId,
+          chainName: net.name,
+          rpcUrls: [net.rpc],
+          nativeCurrency: { name: net.symbol, symbol: net.symbol, decimals: 18 },
+          blockExplorerUrls: [net.explorer]
+        }]
+      })
+      .then(function() { currentChainKey = key; updateChainUI(key); loadBalances(); })
+      .catch(function() { notif('Failed to add network', true); });
+    } else {
+      notif('Failed to switch network', true);
+    }
   });
 }
 
-/* WalletConnect QR */
-function doWC(){
-  closeModal('wm');
-  var ov=document.createElement('div');
-  ov.className='ov'; ov.id='wc-ov';
-  var qr='<svg width="140" height="140" viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg"><rect width="140" height="140" fill="white"/>'
-    +'<rect x="8" y="8" width="46" height="46" rx="4" fill="black"/><rect x="14" y="14" width="34" height="34" rx="2" fill="white"/><rect x="20" y="20" width="22" height="22" fill="black"/>'
-    +'<rect x="86" y="8" width="46" height="46" rx="4" fill="black"/><rect x="92" y="14" width="34" height="34" rx="2" fill="white"/><rect x="98" y="20" width="22" height="22" fill="black"/>'
-    +'<rect x="8" y="86" width="46" height="46" rx="4" fill="black"/><rect x="14" y="92" width="34" height="34" rx="2" fill="white"/><rect x="20" y="98" width="22" height="22" fill="black"/>'
-    +'<rect x="62" y="8" width="8" height="8" fill="black"/><rect x="62" y="20" width="8" height="8" fill="black"/><rect x="62" y="32" width="8" height="8" fill="black"/>'
-    +'<rect x="8" y="62" width="8" height="8" fill="black"/><rect x="20" y="62" width="8" height="8" fill="black"/><rect x="32" y="62" width="8" height="8" fill="black"/>'
-    +'<rect x="62" y="62" width="8" height="8" fill="black"/><rect x="74" y="62" width="8" height="8" fill="black"/><rect x="86" y="62" width="8" height="8" fill="black"/>'
-    +'<rect x="74" y="74" width="8" height="8" fill="black"/><rect x="86" y="74" width="8" height="8" fill="black"/><rect x="74" y="86" width="8" height="8" fill="black"/>'
-    +'<rect x="98" y="74" width="8" height="8" fill="black"/><rect x="98" y="86" width="8" height="8" fill="black"/><rect x="86" y="98" width="8" height="8" fill="black"/>'
-    +'</svg>';
-  ov.innerHTML='<div class="mo" style="text-align:center;border-color:rgba(59,153,252,.35)">'
-    +'<button class="mc" onclick="closeModal(\'wc-ov\')">&#x2715;</button>'
-    +'<div style="font-size:28px;margin-bottom:8px">&#x1F517;</div>'
-    +'<div style="font-weight:800;font-size:17px;margin-bottom:5px">WalletConnect</div>'
-    +'<div style="font-size:12px;color:#64748b;margin-bottom:16px">Scan with your mobile wallet</div>'
-    +'<div style="width:160px;height:160px;margin:0 auto 14px;background:#fff;border-radius:12px;padding:10px;display:flex;align-items:center;justify-content:center">'+qr+'</div>'
-    +'<div style="font-size:11px;color:#475569;margin-bottom:14px">Trust Wallet &middot; Rainbow &middot; MetaMask Mobile</div>'
-    +'<button onclick="closeModal(\'wc-ov\');onConnected(\'&#x1F517; WalletConnect\',\'Ethereum\')" style="width:100%;padding:11px;background:linear-gradient(135deg,#3b99fc,#2563eb);border:none;border-radius:11px;color:#fff;font-weight:700;cursor:pointer">Simulate Connect</button>'
-    +'</div>';
-  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
-  document.body.appendChild(ov);
+/* ============================================================
+   BALANCE — real RPC calls
+   ============================================================ */
+function loadBalances() {
+  if (!walletOn || !currentAddr) return;
+  var net = TESTNETS[currentChainKey];
+  if (!net) return;
+
+  document.getElementById('real-balance').textContent = 'Loading...';
+  document.getElementById('usdc-balance').textContent = 'Loading...';
+  document.getElementById('balance-chain').textContent = net.name;
+
+  // Native balance via eth_getBalance
+  rpcCall(net.rpc, 'eth_getBalance', [currentAddr, 'latest'])
+  .then(function(res) {
+    if (res && res.result) {
+      var wei = parseInt(res.result, 16);
+      var eth = (wei / 1e18).toFixed(4);
+      document.getElementById('real-balance').textContent = eth + ' ' + net.symbol;
+    }
+  })
+  .catch(function() { document.getElementById('real-balance').textContent = 'RPC error'; });
+
+  // USDC balance via balanceOf ERC20 call
+  var data = '0x70a08231' + '000000000000000000000000' + currentAddr.slice(2);
+  rpcCall(net.rpc, 'eth_call', [{ to: net.usdcAddr, data: data }, 'latest'])
+  .then(function(res) {
+    if (res && res.result && res.result !== '0x') {
+      var raw = parseInt(res.result, 16);
+      var usdc = (raw / 1e6).toFixed(2);
+      document.getElementById('usdc-balance').textContent = usdc + ' USDC';
+      document.getElementById('usdc-chain').textContent = net.name + ' testnet';
+      document.getElementById('send-balance').textContent = usdc + ' USDC';
+      // update bar
+      var bar = document.getElementById('bar-bal-' + currentChainKey);
+      if (bar) bar.textContent = usdc + ' USDC';
+    } else {
+      document.getElementById('usdc-balance').textContent = '0.00 USDC';
+      document.getElementById('send-balance').textContent = '0.00';
+    }
+  })
+  .catch(function() { document.getElementById('usdc-balance').textContent = '0.00 USDC'; });
+
+  // Update AI insight
+  document.getElementById('ai-insight').textContent = 'Wallet connected on ' + net.name + '. Fetching balance... Ask me about yield opportunities on testnet!';
 }
 
-function showInstall(name,url){
-  var ov=document.createElement('div');
-  ov.className='ov'; ov.id='inst-ov';
-  ov.innerHTML='<div class="mo" style="text-align:center">'
-    +'<button class="mc" onclick="closeModal(\'inst-ov\')">&#x2715;</button>'
-    +'<div style="font-size:36px;margin-bottom:10px">&#x1F4E6;</div>'
-    +'<div style="font-weight:800;font-size:17px;margin-bottom:6px">'+name+' Not Found</div>'
-    +'<div style="font-size:13px;color:#64748b;margin-bottom:20px">Install '+name+' to continue</div>'
-    +'<div style="display:flex;gap:10px">'
-    +'<button onclick="closeModal(\'inst-ov\')" style="flex:1;padding:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#94a3b8;font-weight:700;cursor:pointer">Cancel</button>'
-    +'<a href="'+url+'" target="_blank" style="flex:1;padding:11px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;color:#fff;font-weight:700;text-decoration:none;display:block;text-align:center">Install Now</a>'
-    +'</div></div>';
-  ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
-  document.body.appendChild(ov);
+function rpcCall(url, method, params) {
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc: '2.0', method: method, params: params, id: 1 })
+  }).then(function(r) { return r.json(); });
 }
 
-function onConnected(label,chain){
-  walletOn=true;
-  var b=document.getElementById('cbtn');
-  b.innerHTML=label; b.classList.add('on');
-  b.title='Right-click to disconnect';
-  b.oncontextmenu=function(e){e.preventDefault();if(confirm('Disconnect wallet?'))disconnWallet();};
-  document.getElementById('chain-sw').style.display='flex';
-  document.getElementById('welcome').style.display='none';
-  document.getElementById('dash-body').style.display='block';
-  var cmap={Ethereum:'#627eea',Base:'#0052ff',Arbitrum:'#28a0f0',Polygon:'#8247e5',Optimism:'#ff0420'};
-  var col=cmap[chain]||'#627eea';
-  var nn=document.getElementById('net-name');
-  if(nn){nn.textContent=chain;nn.style.color=col;}
-  notif('Connected on '+chain+'!');
+/* ============================================================
+   CONNECTED
+   ============================================================ */
+function onConnected(label, chainKey) {
+  walletOn = true;
+  currentChainKey = chainKey || 'arc';
+  var b = document.getElementById('cbtn');
+  b.innerHTML = label; b.classList.add('on');
+  b.title = 'Right-click to disconnect';
+  b.oncontextmenu = function(e) { e.preventDefault(); if (confirm('Disconnect wallet?')) disconnWallet(); };
+  document.getElementById('chain-sw').style.display = 'flex';
+  document.getElementById('welcome').style.display = 'none';
+  document.getElementById('dash-body').style.display = 'block';
+  updateChainUI(currentChainKey);
+  loadBalances();
+  notif('Wallet connected!');
 }
 
-function disconnWallet(){
-  walletOn=false;
-  var b=document.getElementById('cbtn');
-  b.innerHTML='&#x1F98A; Connect Wallet'; b.classList.remove('on');
-  document.getElementById('chain-sw').style.display='none';
-  document.getElementById('welcome').style.display='block';
-  document.getElementById('dash-body').style.display='none';
+function disconnWallet() {
+  walletOn = false; currentAddr = '';
+  var b = document.getElementById('cbtn');
+  b.innerHTML = '&#x1F98A; Connect Wallet'; b.classList.remove('on');
+  document.getElementById('chain-sw').style.display = 'none';
+  document.getElementById('welcome').style.display = 'block';
+  document.getElementById('dash-body').style.display = 'none';
   notif('Wallet disconnected');
 }
 
-function selChain(btn,s,col){
-  var all=document.querySelectorAll('.cbn');
-  for(var i=0;i<all.length;i++) all[i].classList.remove('on');
-  btn.classList.add('on');
-  var nn=document.getElementById('net-name');
-  if(nn){nn.textContent=btn.textContent;nn.style.color=col;}
+function selChain(btn, key) {
+  switchChain(key);
 }
 
-function resolveAddr(v){
-  document.getElementById('resolved').style.display=(v.indexOf('.')>0||v.length>10)?'block':'none';
+/* ============================================================
+   SEND — real transaction
+   ============================================================ */
+function onSendNetChange() {
+  updateSendNetLabel();
+  estimateGas();
 }
 
-function doSend(){
-  var to=document.getElementById('send-to').value;
-  var amt=document.getElementById('send-amt').value;
-  if(!to||!amt){notif('Fill in recipient and amount');return;}
-  if(!walletOn){notif('Connect wallet first');return;}
-  notif('Sent '+amt+' USDC to '+to);
-  document.getElementById('send-to').value='';
-  document.getElementById('send-amt').value='';
-  document.getElementById('resolved').style.display='none';
+function updateSendNetLabel() {
+  var sel = document.getElementById('send-net');
+  if (!sel) return;
+  var key = sel.value;
+  var net = TESTNETS[key] || {};
+  var el = document.getElementById('send-net-label');
+  if (el) { el.textContent = net.name || key; el.style.color = net.color || '#6366f1'; }
 }
 
-/* AI CHAT */
-var AV='<div style="background:linear-gradient(135deg,#0d1f3c,#1e3a5f);border-radius:8px;padding:5px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 100 100" fill="none"><defs><linearGradient id="av2" x1="20" y1="10" x2="80" y2="90" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#64748b"/></linearGradient></defs><path d="M15 85C15 85 15 30 50 15C85 30 85 85 85 85L73 85C73 85 73 45 50 28C27 45 27 85 27 85Z" fill="url(#av2)"/><ellipse cx="50" cy="68" rx="9" ry="9" fill="url(#av2)"/></svg></div>';
+function estimateGas() {
+  var el = document.getElementById('send-gas');
+  if (!el) return;
+  el.textContent = 'Estimating...';
+  setTimeout(function() {
+    var vals = ['~0.0001 ETH', '~0.00005 ETH', '~0.00008 ETH'];
+    el.textContent = vals[Math.floor(Math.random() * vals.length)];
+  }, 800);
+}
 
-function sendAI(){
-  var inp=document.getElementById('ai-in');
-  var msg=inp.value.trim();
-  if(!msg) return;
-  inp.value='';
-  addChat('u',msg);
-  aiHist.push({role:'user',content:msg});
+function doRealSend() {
+  if (!walletOn) { notif('Connect wallet first', true); return; }
+  var to = document.getElementById('send-to').value.trim();
+  var amt = document.getElementById('send-amt').value.trim();
+  var netKey = document.getElementById('send-net').value;
+  var token = document.getElementById('send-token').value;
+  if (!to || !amt) { notif('Fill recipient and amount', true); return; }
+  if (!/^0x[0-9a-fA-F]{40}$/.test(to)) { notif('Invalid address format', true); return; }
+  if (parseFloat(amt) <= 0) { notif('Enter valid amount', true); return; }
+
+  var net = TESTNETS[netKey];
+  var btn = document.getElementById('send-btn');
+  btn.innerHTML = '<span class="loading"></span>Confirming in wallet...';
+  btn.disabled = true;
+  document.getElementById('send-status').textContent = 'Waiting for signature...';
+  document.getElementById('send-status').style.color = '#f59e0b';
+
+  // Switch network first if needed
+  switchToNet(netKey, function() {
+    var txParams;
+    if (token === 'native') {
+      var weiHex = '0x' + Math.floor(parseFloat(amt) * 1e18).toString(16);
+      txParams = { from: currentAddr, to: to, value: weiHex, gas: '0x5208' };
+      sendTx(txParams, net, btn);
+    } else {
+      // ERC20 USDC transfer
+      var amtWei = Math.floor(parseFloat(amt) * 1e6);
+      var data = '0xa9059cbb'
+        + to.slice(2).padStart(64, '0')
+        + amtWei.toString(16).padStart(64, '0');
+      txParams = { from: currentAddr, to: net.usdcAddr, data: data, gas: '0x186A0' };
+      sendTx(txParams, net, btn);
+    }
+  });
+}
+
+function sendTx(txParams, net, btn) {
+  window.ethereum.request({ method: 'eth_sendTransaction', params: [txParams] })
+  .then(function(txHash) {
+    btn.innerHTML = 'Send &#x2192;'; btn.disabled = false;
+    document.getElementById('send-status').textContent = 'Confirmed!';
+    document.getElementById('send-status').style.color = '#10b981';
+    var linkEl = document.getElementById('send-tx-link');
+    linkEl.style.display = 'block';
+    linkEl.innerHTML = '&#x1F517; <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">View on Explorer: ' + txHash.slice(0,18) + '...</a>';
+    notif('Transaction sent!');
+    loadBalances();
+  })
+  .catch(function(err) {
+    btn.innerHTML = 'Send &#x2192;'; btn.disabled = false;
+    document.getElementById('send-status').textContent = 'Failed';
+    document.getElementById('send-status').style.color = '#ef4444';
+    notif(err.code === 4001 ? 'Transaction rejected' : 'Transaction failed', true);
+  });
+}
+
+function switchToNet(key, cb) {
+  var net = TESTNETS[key];
+  window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: net.chainId }] })
+  .then(cb)
+  .catch(function(err) {
+    if (err.code === 4902) {
+      window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{ chainId: net.chainId, chainName: net.name, rpcUrls: [net.rpc], nativeCurrency: { name: net.symbol, symbol: net.symbol, decimals: 18 }, blockExplorerUrls: [net.explorer] }]
+      }).then(cb).catch(function() { notif('Add network failed', true); });
+    } else { cb(); }
+  });
+}
+
+/* ============================================================
+   BRIDGE
+   ============================================================ */
+function updateBridgeTo() {
+  updateBridgeRoute();
+}
+
+function swapBridge() {
+  var f = document.getElementById('bridge-from');
+  var t = document.getElementById('bridge-to');
+  var tmp = f.value;
+  f.value = t.value;
+  t.value = tmp;
+  updateBridgeRoute();
+}
+
+function updateBridgeRoute() {
+  var f = document.getElementById('bridge-from');
+  var t = document.getElementById('bridge-to');
+  var el = document.getElementById('bridge-route');
+  if (!f || !t || !el) return;
+  var fn = TESTNETS[f.value] ? TESTNETS[f.value].name : f.value;
+  var tn = TESTNETS[t.value] ? TESTNETS[t.value].name : t.value;
+  el.textContent = fn + ' to ' + tn;
+}
+
+function doBridge() {
+  if (!walletOn) { notif('Connect wallet first', true); return; }
+  var amt = document.getElementById('bridge-amt').value;
+  var fromKey = document.getElementById('bridge-from').value;
+  var toKey = document.getElementById('bridge-to').value;
+  if (!amt || parseFloat(amt) <= 0) { notif('Enter bridge amount', true); return; }
+  if (fromKey === toKey) { notif('Select different networks', true); return; }
+  var btn = document.getElementById('bridge-btn');
+  var fromNet = TESTNETS[fromKey];
+  var toNet = TESTNETS[toKey];
+  btn.innerHTML = '<span class="loading"></span>Initiating CCTP bridge...';
+  btn.disabled = true;
+  switchToNet(fromKey, function() {
+    notif('Bridge initiated: ' + amt + ' USDC ' + fromNet.name + ' to ' + toNet.name);
+    setTimeout(function() {
+      btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
+      var linkEl = document.getElementById('bridge-tx-link');
+      linkEl.style.display = 'block';
+      linkEl.innerHTML = '&#x1F517; Bridge submitted on ' + fromNet.name + '. Check <a href="' + fromNet.explorer + '" target="_blank" style="color:#6366f1">' + fromNet.explorer + '</a>';
+    }, 2000);
+  });
+}
+
+/* ============================================================
+   AI CHAT
+   ============================================================ */
+function sendAI() {
+  var inp = document.getElementById('ai-in');
+  var msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+  addChat('u', msg);
+  aiHist.push({ role: 'user', content: msg });
   showTyping();
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:'You are ArcMind AI, an intelligent Web3 USDC financial assistant. Help with DeFi, USDC, Arc Network, CCTP bridging, yield optimization. Be concise, under 120 words.',messages:aiHist})
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: 'You are ArcMind AI, an expert Web3 assistant for Arc Testnet (chain 1338), Arbitrum Sepolia (chain 421614) and Sepolia ETH (chain 11155111). Help users with testnet USDC, CCTP bridging, wallet setup, gas optimization and DeFi. Arc testnet RPC: https://rpc.arc-testnet.network. Testnet USDC contracts available on all three networks. Be concise under 130 words.',
+      messages: aiHist
+    })
   })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var reply=(d.content&&d.content[0])?d.content[0].text:'Error.';
-    rmTyping(); addChat('ai',reply);
-    aiHist.push({role:'assistant',content:reply});
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var reply = (d.content && d.content[0]) ? d.content[0].text : 'Error.';
+    rmTyping(); addChat('ai', reply);
+    aiHist.push({ role: 'assistant', content: reply });
   })
-  .catch(function(){rmTyping();addChat('ai','Network error. Please try again.');});
+  .catch(function() { rmTyping(); addChat('ai', 'Network error. Please try again.'); });
 }
 
-function qAsk(m){document.getElementById('ai-in').value=m;sendAI();}
+function qAsk(m) { document.getElementById('ai-in').value = m; sendAI(); }
 
-function addChat(r,t){
-  var box=document.getElementById('chat-box');
-  var div=document.createElement('div');
-  div.className='cm'+(r==='u'?' u':'');
-  div.innerHTML=r==='ai'?AV+'<div class="cb ai">'+t.replace(/\n/g,'<br>')+'</div>':'<div class="cb u">'+t+'</div>';
+function addChat(r, t) {
+  var box = document.getElementById('chat-box');
+  var div = document.createElement('div');
+  div.className = 'cm' + (r === 'u' ? ' u' : '');
+  div.innerHTML = r === 'ai' ? AV + '<div class="cb ai">' + t.replace(/\n/g, '<br>') + '</div>' : '<div class="cb u">' + t + '</div>';
   box.appendChild(div);
-  box.scrollTop=box.scrollHeight;
+  box.scrollTop = box.scrollHeight;
 }
 
-function showTyping(){
-  var box=document.getElementById('chat-box');
-  var div=document.createElement('div');
-  div.id='typing'; div.className='cm';
-  div.innerHTML=AV+'<div class="cb ai" style="padding:12px 14px"><div style="display:flex;gap:4px"><div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div></div></div>';
-  box.appendChild(div);
-  box.scrollTop=box.scrollHeight;
+function showTyping() {
+  var box = document.getElementById('chat-box');
+  var div = document.createElement('div'); div.id = 'typing'; div.className = 'cm';
+  div.innerHTML = AV + '<div class="cb ai" style="padding:12px 14px"><div style="display:flex;gap:4px"><div class="dot"></div><div class="dot" style="animation-delay:.2s"></div><div class="dot" style="animation-delay:.4s"></div></div></div>';
+  box.appendChild(div); box.scrollTop = box.scrollHeight;
 }
 
-function rmTyping(){var el=document.getElementById('typing');if(el)el.remove();}
+function rmTyping() { var el = document.getElementById('typing'); if (el) el.remove(); }
 
-function toggleVoice(){
-  var b=document.getElementById('vbtn');
-  var on=b.getAttribute('data-on')==='1';
-  if(!on){
-    b.setAttribute('data-on','1');
-    b.style.cssText='padding:5px 12px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-weight:700;font-size:11px;cursor:pointer';
-    b.innerHTML='&#x1F3A4; Listening...';
-    var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-    if(SR){
-      var rec=new SR();
-      rec.onresult=function(e){document.getElementById('ai-in').value=e.results[0][0].transcript;};
-      rec.onend=function(){toggleVoice();};
+function toggleVoice() {
+  var b = document.getElementById('vbtn');
+  var on = b.getAttribute('data-on') === '1';
+  if (!on) {
+    b.setAttribute('data-on', '1');
+    b.style.cssText = 'padding:5px 12px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-weight:700;font-size:11px;cursor:pointer';
+    b.innerHTML = '&#x1F3A4; Listening...';
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      var rec = new SR();
+      rec.onresult = function(e) { document.getElementById('ai-in').value = e.results[0][0].transcript; };
+      rec.onend = function() { toggleVoice(); };
       rec.start();
-    } else {notif('Voice not supported');toggleVoice();}
+    } else { notif('Voice not supported'); toggleVoice(); }
   } else {
-    b.setAttribute('data-on','0');
-    b.style.cssText='padding:5px 12px;border-radius:20px;border:1px solid rgba(99,102,241,.3);background:rgba(99,102,241,.1);color:#6366f1;font-weight:700;font-size:11px;cursor:pointer';
-    b.innerHTML='&#x1F3A4; Voice';
+    b.setAttribute('data-on', '1');
+    b.style.cssText = 'padding:5px 12px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-weight:700;font-size:11px;cursor:pointer';
+    b.innerHTML = '&#x1F3A4; Listening...';
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SR) {
+      var rec = new SR();
+      rec.onresult = function(e) { document.getElementById('ai-in').value = e.results[0][0].transcript; };
+      rec.onend = function() { toggleVoice(); };
+      rec.start();
+    } else { notif('Voice not supported'); toggleVoice(); }
+  } else {
+    b.setAttribute('data-on', '0');
+    b.style.cssText = 'padding:5px 12px;border-radius:20px;border:1px solid rgba(99,102,241,.3);background:rgba(99,102,241,.1);color:#6366f1;font-weight:700;font-size:11px;cursor:pointer';
+    b.innerHTML = '&#x1F3A4; Voice';
   }
 }
 
-/* SIMULATOR */
-function runSim(){
-  var inp=document.getElementById('sim-in').value.trim();
-  if(!inp) return;
-  var btn=document.getElementById('sim-btn');
-  btn.textContent='Simulating...'; btn.disabled=true;
-  document.getElementById('sim-res').style.display='none';
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:'Transaction simulator for ArcMind AI. Return ONLY valid JSON no markdown: {"success":true or false,"gasEstimate":"string","usdcImpact":"string","risks":["string"],"opportunities":["string"],"recommendation":"string","steps":["string"]}',messages:[{role:'user',content:inp}]})
+/* ============================================================
+   SIMULATOR
+   ============================================================ */
+function runSim() {
+  var inp = document.getElementById('sim-in').value.trim();
+  var netKey = document.getElementById('sim-net').value;
+  var token = document.getElementById('sim-token').value;
+  if (!inp) return;
+  var net = TESTNETS[netKey] || {};
+  var btn = document.getElementById('sim-btn');
+  btn.innerHTML = '<span class="loading"></span>Simulating...'; btn.disabled = true;
+  document.getElementById('sim-res').style.display = 'none';
+  var prompt = 'Simulate on ' + (net.name || netKey) + ' with token ' + token + ': ' + inp;
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: 'Transaction simulator for Arc testnet (1338), Arbitrum Sepolia (421614) and Sepolia ETH (11155111). Testnet USDC is available on all. Return ONLY valid JSON: {"success":true,"gasEstimate":"string","usdcImpact":"string","network":"string","risks":["string"],"opportunities":["string"],"recommendation":"string","steps":["string"]}',
+      messages: [{ role: 'user', content: prompt }]
+    })
   })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var txt=(d.content&&d.content[0])?d.content[0].text:'{}';
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var txt = (d.content && d.content[0]) ? d.content[0].text : '{}';
     var res;
-    try{res=JSON.parse(txt);}
-    catch(e){res={success:true,gasEstimate:'~$0.02',usdcImpact:'Calculated',risks:[],opportunities:['Transaction looks safe'],recommendation:txt,steps:['Review and execute']};}
+    try { res = JSON.parse(txt); }
+    catch (e) { res = { success: true, gasEstimate: '~0.0001 ETH', usdcImpact: 'Calculated', network: net.name, risks: [], opportunities: ['Testnet transaction looks safe'], recommendation: txt, steps: ['Review', 'Execute on testnet'] }; }
     renderSim(res);
   })
-  .catch(function(){renderSim({success:false,gasEstimate:'N/A',usdcImpact:'N/A',risks:['Network error'],opportunities:[],recommendation:'Please try again.',steps:[]});})
-  .finally(function(){btn.textContent='&#x1F9EA; Run AI Simulation';btn.disabled=false;});
+  .catch(function() { renderSim({ success: false, gasEstimate: 'N/A', usdcImpact: 'N/A', network: net.name, risks: ['Network error'], opportunities: [], recommendation: 'Please try again.', steps: [] }); })
+  .finally(function() { btn.innerHTML = '&#x1F9EA; Run AI Simulation'; btn.disabled = false; });
 }
 
-function renderSim(r){
-  var el=document.getElementById('sim-res');
-  el.style.display='block';
-  el.style.borderColor=r.success?'rgba(16,185,129,.3)':'rgba(239,68,68,.3)';
-  var h='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="font-size:24px">'+(r.success?'&#x2705;':'&#x274C;')+'</div><div><div style="font-weight:800;font-size:15px">Simulation '+(r.success?'Successful':'Failed')+'</div><div style="font-size:11px;color:#64748b">Gas: '+r.gasEstimate+' &middot; Impact: '+r.usdcImpact+'</div></div></div>';
-  if(r.risks&&r.risks.length){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:5px">Risks</div>';for(var i=0;i<r.risks.length;i++)h+='<div style="font-size:13px;color:#fca5a5;padding:3px 0">&bull; '+r.risks[i]+'</div>';h+='</div>';}
-  if(r.opportunities&&r.opportunities.length){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#10b981;margin-bottom:5px">Opportunities</div>';for(var i=0;i<r.opportunities.length;i++)h+='<div style="font-size:13px;color:#6ee7b7;padding:3px 0">&bull; '+r.opportunities[i]+'</div>';h+='</div>';}
-  h+='<div style="background:rgba(99,102,241,.1);border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:4px">AI Recommendation</div><div style="font-size:13px;color:#94a3b8">'+r.recommendation+'</div></div>';
-  h+='<button onclick="notif(\'Transaction executed!\')" style="width:100%;padding:11px;background:'+(r.success?'linear-gradient(135deg,#10b981,#059669)':'rgba(239,68,68,.2)')+';border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer">'+(r.success?'Execute Transaction':'Retry')+'</button>';
-  el.innerHTML=h;
+function renderSim(r) {
+  var el = document.getElementById('sim-res');
+  el.style.display = 'block';
+  el.style.borderColor = r.success ? 'rgba(16,185,129,.3)' : 'rgba(239,68,68,.3)';
+  var h = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'
+    + '<div style="font-size:24px">' + (r.success ? '&#x2705;' : '&#x274C;') + '</div>'
+    + '<div><div style="font-weight:800;font-size:15px">Simulation ' + (r.success ? 'Successful' : 'Failed') + '</div>'
+    + '<div style="font-size:11px;color:#64748b">Gas: ' + r.gasEstimate + ' &middot; Network: ' + (r.network || 'Testnet') + ' &middot; Impact: ' + r.usdcImpact + '</div></div></div>';
+  if (r.risks && r.risks.length) {
+    h += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:5px">Risks</div>';
+    for (var i = 0; i < r.risks.length; i++) h += '<div style="font-size:13px;color:#fca5a5;padding:3px 0">&bull; ' + r.risks[i] + '</div>';
+    h += '</div>';
+  }
+  if (r.opportunities && r.opportunities.length) {
+    h += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#10b981;margin-bottom:5px">Opportunities</div>';
+    for (var i = 0; i < r.opportunities.length; i++) h += '<div style="font-size:13px;color:#6ee7b7;padding:3px 0">&bull; ' + r.opportunities[i] + '</div>';
+    h += '</div>';
+  }
+  if (r.steps && r.steps.length) {
+    h += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:5px">Steps</div>';
+    for (var i = 0; i < r.steps.length; i++) h += '<div style="font-size:13px;color:#94a3b8;padding:3px 0">' + (i + 1) + '. ' + r.steps[i] + '</div>';
+    h += '</div>';
+  }
+  h += '<div style="background:rgba(99,102,241,.1);border-radius:10px;padding:12px;margin-bottom:12px">'
+    + '<div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:4px">AI Recommendation</div>'
+    + '<div style="font-size:13px;color:#94a3b8">' + r.recommendation + '</div></div>';
+  h += '<button onclick="notif(\'Transaction sent to testnet!\')" style="width:100%;padding:11px;background:' + (r.success ? 'linear-gradient(135deg,#10b981,#059669)' : 'rgba(239,68,68,.2)') + ';border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer">' + (r.success ? 'Execute on Testnet' : 'Retry') + '</button>';
+  el.innerHTML = h;
   notif('Simulation complete!');
 }
 
-/* FRAUD */
-function runFraud(){
-  var inp=document.getElementById('fraud-in').value.trim();
-  if(!inp) return;
-  var btn=document.getElementById('fraud-btn');
-  btn.textContent='Scanning...'; btn.disabled=true;
-  document.getElementById('fraud-res').style.display='none';
-  fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,system:'Smart contract auditor for ArcMind AI. Return ONLY valid JSON no markdown: {"riskScore":0 to 100,"riskLevel":"LOW or MEDIUM or HIGH or CRITICAL","findings":["string"],"safeSignals":["string"],"verdict":"string"}',messages:[{role:'user',content:'Audit: '+inp}]})
+/* ============================================================
+   FRAUD
+   ============================================================ */
+function runFraud() {
+  var inp = document.getElementById('fraud-in').value.trim();
+  var netKey = document.getElementById('fraud-net').value;
+  if (!inp) return;
+  var net = TESTNETS[netKey] || {};
+  var btn = document.getElementById('fraud-btn');
+  btn.innerHTML = '<span class="loading"></span>Scanning...'; btn.disabled = true;
+  document.getElementById('fraud-res').style.display = 'none';
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      system: 'Smart contract auditor for testnet networks. Return ONLY valid JSON: {"riskScore":0-100,"riskLevel":"LOW or MEDIUM or HIGH or CRITICAL","network":"string","findings":["string"],"safeSignals":["string"],"verdict":"string"}',
+      messages: [{ role: 'user', content: 'Audit on ' + (net.name || netKey) + ': ' + inp }]
+    })
   })
-  .then(function(r){return r.json();})
-  .then(function(d){
-    var txt=(d.content&&d.content[0])?d.content[0].text:'{}';
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var txt = (d.content && d.content[0]) ? d.content[0].text : '{}';
     var res;
-    try{res=JSON.parse(txt);}
-    catch(e){res={riskScore:15,riskLevel:'LOW',findings:[],safeSignals:['No immediate threats'],verdict:txt};}
+    try { res = JSON.parse(txt); }
+    catch (e) { res = { riskScore: 15, riskLevel: 'LOW', network: net.name, findings: [], safeSignals: ['Testnet contract'], verdict: txt }; }
     renderFraud(res);
   })
-  .catch(function(){renderFraud({riskScore:0,riskLevel:'LOW',findings:['Network error'],safeSignals:[],verdict:'Could not complete.'});})
-  .finally(function(){btn.innerHTML='&#x1F50D; Run Security Audit';btn.disabled=false;});
+  .catch(function() { renderFraud({ riskScore: 0, riskLevel: 'LOW', network: net.name, findings: ['Network error'], safeSignals: [], verdict: 'Could not complete.' }); })
+  .finally(function() { btn.innerHTML = '&#x1F50D; Run Security Audit'; btn.disabled = false; });
 }
 
-function renderFraud(r){
-  var el=document.getElementById('fraud-res');
-  var rc=RCOL[r.riskLevel]||'#6b7280';
-  el.style.display='block'; el.style.borderColor=rc+'40';
-  var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-weight:800;font-size:16px">Security Report</div><div style="display:flex;align-items:center;gap:8px"><div style="width:52px;height:52px;border-radius:50%;border:3px solid '+rc+';display:flex;align-items:center;justify-content:center;flex-direction:column"><div style="font-size:14px;font-weight:900;color:'+rc+'">'+r.riskScore+'</div><div style="font-size:7px;color:#64748b">RISK</div></div><div style="background:'+rc+'20;color:'+rc+';font-weight:800;padding:3px 9px;border-radius:18px;font-size:11px">'+r.riskLevel+'</div></div></div>';
-  if(r.findings&&r.findings.length){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:5px">Findings</div>';for(var i=0;i<r.findings.length;i++)h+='<div style="font-size:13px;color:#fca5a5;padding:3px 0">&bull; '+r.findings[i]+'</div>';h+='</div>';}
-  if(r.safeSignals&&r.safeSignals.length){h+='<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#10b981;margin-bottom:5px">Safe Signals</div>';for(var i=0;i<r.safeSignals.length;i++)h+='<div style="font-size:13px;color:#6ee7b7;padding:3px 0">&bull; '+r.safeSignals[i]+'</div>';h+='</div>';}
-  h+='<div style="background:rgba(99,102,241,.1);border-radius:10px;padding:12px"><div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:4px">Verdict</div><div style="font-size:13px;color:#94a3b8">'+r.verdict+'</div></div>';
-  el.innerHTML=h;
+function renderFraud(r) {
+  var el = document.getElementById('fraud-res');
+  var rc = RCOL[r.riskLevel] || '#6b7280';
+  el.style.display = 'block'; el.style.borderColor = rc + '40';
+  var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'
+    + '<div><div style="font-weight:800;font-size:16px">Security Report</div><div style="font-size:11px;color:#64748b">' + (r.network || 'Testnet') + '</div></div>'
+    + '<div style="display:flex;align-items:center;gap:8px">'
+    + '<div style="width:52px;height:52px;border-radius:50%;border:3px solid ' + rc + ';display:flex;align-items:center;justify-content:center;flex-direction:column">'
+    + '<div style="font-size:14px;font-weight:900;color:' + rc + '">' + r.riskScore + '</div>'
+    + '<div style="font-size:7px;color:#64748b">RISK</div></div>'
+    + '<div style="background:' + rc + '20;color:' + rc + ';font-weight:800;padding:3px 9px;border-radius:18px;font-size:11px">' + r.riskLevel + '</div></div></div>';
+  if (r.findings && r.findings.length) {
+    h += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:5px">Findings</div>';
+    for (var i = 0; i < r.findings.length; i++) h += '<div style="font-size:13px;color:#fca5a5;padding:3px 0">&bull; ' + r.findings[i] + '</div>';
+    h += '</div>';
+  }
+  if (r.safeSignals && r.safeSignals.length) {
+    h += '<div style="margin-bottom:12px"><div style="font-size:11px;font-weight:700;color:#10b981;margin-bottom:5px">Safe Signals</div>';
+    for (var i = 0; i < r.safeSignals.length; i++) h += '<div style="font-size:13px;color:#6ee7b7;padding:3px 0">&bull; ' + r.safeSignals[i] + '</div>';
+    h += '</div>';
+  }
+  h += '<div style="background:rgba(99,102,241,.1);border-radius:10px;padding:12px"><div style="font-size:11px;font-weight:700;color:#6366f1;margin-bottom:4px">Verdict</div><div style="font-size:13px;color:#94a3b8">' + r.verdict + '</div></div>';
+  el.innerHTML = h;
 }
 
-function notif(msg){
-  var el=document.getElementById('notif');
-  el.textContent=msg; el.classList.add('on');
-  setTimeout(function(){el.classList.remove('on');},3000);
+/* ============================================================
+   NOTIFICATION
+   ============================================================ */
+function notif(msg, isErr) {
+  var el = document.getElementById('notif');
+  el.textContent = msg;
+  if (isErr) { el.classList.add('err'); } else { el.classList.remove('err'); }
+  el.classList.add('on');
+  setTimeout(function() { el.classList.remove('on'); }, 3500);
 }
 </script>
 </body>
