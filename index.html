@@ -551,26 +551,45 @@ function showWallet() {
 
 function closeModal(id) { var el = document.getElementById(id); if (el) el.remove(); }
 
-function doMetaMask() {
-  var btn = document.getElementById('mm-btn');
-  if (btn) { btn.style.opacity = '0.6'; btn.disabled = true; }
-  if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
+/* Universal connect — works with MetaMask, Brave, Coinbase, any injected wallet */
+function connectWithProvider(icon, walletName) {
+  /* No provider at all — show install */
+  if (typeof window.ethereum === 'undefined') {
     closeModal('wm');
-    showInstall('MetaMask', 'https://metamask.io/download/');
+    var urls = {
+      'MetaMask': 'https://metamask.io/download/',
+      'Brave': 'https://brave.com/download/',
+      'Coinbase': 'https://www.coinbase.com/wallet/downloads'
+    };
+    showInstall(walletName, urls[walletName] || 'https://metamask.io/download/');
     return;
   }
+
+  /* Disable clicked button to show loading */
+  var mmBtn = document.getElementById('mm-btn');
+  if (mmBtn) { mmBtn.style.opacity = '0.6'; mmBtn.disabled = true; }
+
+  /* Request accounts — triggers the wallet popup */
   window.ethereum.request({ method: 'eth_requestAccounts' })
   .then(function(accounts) {
+    if (!accounts || accounts.length === 0) { throw new Error('No accounts'); }
     currentAddr = accounts[0];
     return window.ethereum.request({ method: 'eth_chainId' });
   })
   .then(function(cid) {
     var chainKey = getChainKey(cid);
     closeModal('wm');
-    onConnected('&#x1F98A; ' + currentAddr.slice(0,6) + '...' + currentAddr.slice(-4), chainKey);
+    onConnected(icon + ' ' + currentAddr.slice(0,6) + '...' + currentAddr.slice(-4), chainKey);
+
+    /* Listen for account/chain changes */
+    if (window.ethereum.removeAllListeners) window.ethereum.removeAllListeners();
     window.ethereum.on('accountsChanged', function(a) {
       if (!a || !a.length) { disconnWallet(); }
-      else { currentAddr = a[0]; document.getElementById('cbtn').innerHTML = '&#x1F98A; ' + a[0].slice(0,6) + '...' + a[0].slice(-4); loadBalances(); }
+      else {
+        currentAddr = a[0];
+        document.getElementById('cbtn').innerHTML = icon + ' ' + a[0].slice(0,6) + '...' + a[0].slice(-4);
+        loadBalances();
+      }
     });
     window.ethereum.on('chainChanged', function(cid2) {
       var k = getChainKey(cid2);
@@ -581,28 +600,19 @@ function doMetaMask() {
   })
   .catch(function(err) {
     closeModal('wm');
-    notif(err.code === 4001 ? 'Connection rejected' : 'MetaMask error', true);
+    if (mmBtn) { mmBtn.style.opacity = '1'; mmBtn.disabled = false; }
+    if (err.code === 4001 || err.code === 'ACTION_REJECTED') {
+      notif('Connection rejected by user', true);
+    } else {
+      notif('Wallet error: ' + (err.message || 'Please try again'), true);
+    }
   });
 }
 
+function doMetaMask() { connectWithProvider('&#x1F98A;', 'MetaMask'); }
 function doOther(name) {
-  if (typeof window.ethereum === 'undefined') {
-    closeModal('wm');
-    showInstall(name + ' Wallet', name === 'Brave' ? 'https://brave.com/download/' : 'https://www.coinbase.com/wallet/downloads');
-    return;
-  }
-  window.ethereum.request({ method: 'eth_requestAccounts' })
-  .then(function(accounts) {
-    currentAddr = accounts[0];
-    return window.ethereum.request({ method: 'eth_chainId' });
-  })
-  .then(function(cid) {
-    var chainKey = getChainKey(cid);
-    closeModal('wm');
-    var icon = name === 'Brave' ? '&#x1F981;' : '&#x1F535;';
-    onConnected(icon + ' ' + currentAddr.slice(0,6) + '...' + currentAddr.slice(-4), chainKey);
-  })
-  .catch(function(err) { closeModal('wm'); notif(err.code === 4001 ? 'Rejected' : 'Wallet error', true); });
+  var icons = { Brave: '&#x1F981;', Coinbase: '&#x1F535;' };
+  connectWithProvider(icons[name] || '&#x1F4B3;', name);
 }
 
 function doWC() {
@@ -983,18 +993,7 @@ function toggleVoice() {
     b.style.cssText = 'padding:5px 12px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-weight:700;font-size:11px;cursor:pointer';
     b.innerHTML = '&#x1F3A4; Listening...';
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SR) {
-      var rec = new SR();
-      rec.onresult = function(e) { document.getElementById('ai-in').value = e.results[0][0].transcript; };
-      rec.onend = function() { toggleVoice(); };
-      rec.start();
-    } else { notif('Voice not supported'); toggleVoice(); }
-  } else {
-    b.setAttribute('data-on', '1');
-    b.style.cssText = 'padding:5px 12px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-weight:700;font-size:11px;cursor:pointer';
-    b.innerHTML = '&#x1F3A4; Listening...';
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SR) {
+    if(SR) {
       var rec = new SR();
       rec.onresult = function(e) { document.getElementById('ai-in').value = e.results[0][0].transcript; };
       rec.onend = function() { toggleVoice(); };
