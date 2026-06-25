@@ -374,19 +374,21 @@ input::placeholder,textarea::placeholder{color:#475569}
 var TESTNETS = {
   'arc': {
     name: 'Arc Testnet',
-    chainId: '0x53A', // 1338
+    chainId: '0x53A',
     chainIdDec: 1338,
-    rpc: 'https://rpc.arc-testnet.network',
-    explorer: 'https://explorer.arc-testnet.network',
-    symbol: 'ARC',
+    rpc: 'https://rpc.arc.io',
+    rpcFallback: 'https://rpc-arc.t.conduit.xyz',
+    explorer: 'https://explorer.arc.io',
+    symbol: 'ETH',
     color: '#6366f1',
-    usdcAddr: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238'
+    usdcAddr: '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d'
   },
   'arb-sep': {
     name: 'Arbitrum Sepolia',
-    chainId: '0x66EEE', // 421614
+    chainId: '0x66EEE',
     chainIdDec: 421614,
     rpc: 'https://sepolia-rollup.arbitrum.io/rpc',
+    rpcFallback: 'https://arbitrum-sepolia.blockpi.network/v1/rpc/public',
     explorer: 'https://sepolia.arbiscan.io',
     symbol: 'ETH',
     color: '#28a0f0',
@@ -394,9 +396,10 @@ var TESTNETS = {
   },
   'sepolia': {
     name: 'Sepolia ETH',
-    chainId: '0xAA36A7', // 11155111
+    chainId: '0xAA36A7',
     chainIdDec: 11155111,
-    rpc: 'https://rpc.sepolia.org',
+    rpc: 'https://ethereum-sepolia-rpc.publicnode.com',
+    rpcFallback: 'https://rpc.sepolia.org',
     explorer: 'https://sepolia.etherscan.io',
     symbol: 'ETH',
     color: '#627eea',
@@ -559,7 +562,7 @@ function connectWithProvider(icon, walletName) {
     var urls = {
       'MetaMask': 'https://metamask.io/download/',
       'Brave': 'https://brave.com/download/',
-      'Coinbase':'https://www.coinbase.com/wallet/downloads'
+      'Coinbase': 'https://www.coinbase.com/wallet/downloads'
     };
     showInstall(walletName, urls[walletName] || 'https://metamask.io/download/');
     return;
@@ -677,27 +680,45 @@ function switchChain(key) {
   if (!walletOn) { notif('Connect wallet first', true); return; }
   var net = TESTNETS[key];
   if (!net) return;
-  window.ethereum.request({
-    method: 'wallet_switchEthereumChain',
-    params: [{ chainId: net.chainId }]
-  })
-  .then(function() { currentChainKey = key; updateChainUI(key); loadBalances(); })
+  addOrSwitchNet(key, function() {
+    currentChainKey = key;
+    updateChainUI(key);
+    loadBalances();
+  });
+}
+
+function addOrSwitchNet(key, onSuccess) {
+  var net = TESTNETS[key];
+  var rpcs = [net.rpc];
+  if (net.rpcFallback) rpcs.push(net.rpcFallback);
+  var params = [{
+    chainId: net.chainId,
+    chainName: net.name,
+    rpcUrls: rpcs,
+    nativeCurrency: { name: net.symbol, symbol: net.symbol, decimals: 18 },
+    blockExplorerUrls: [net.explorer]
+  }];
+  // First try switch, if 4902 then add
+  window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: net.chainId }] })
+  .then(function() { if (onSuccess) onSuccess(); })
   .catch(function(err) {
-    if (err.code === 4902) {
-      window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{
-          chainId: net.chainId,
-          chainName: net.name,
-          rpcUrls: [net.rpc],
-          nativeCurrency: { name: net.symbol, symbol: net.symbol, decimals: 18 },
-          blockExplorerUrls: [net.explorer]
-        }]
+    if (err.code === 4902 || err.code === -32603) {
+      window.ethereum.request({ method: 'wallet_addEthereumChain', params: params })
+      .then(function() {
+        // After adding, switch to it
+        return window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: net.chainId }] });
       })
-      .then(function() { currentChainKey = key; updateChainUI(key); loadBalances(); })
-      .catch(function() { notif('Failed to add network', true); });
+      .then(function() { if (onSuccess) onSuccess(); })
+      .catch(function(e2) {
+        if (e2.code !== 4001) { notif('Network added! Please switch manually in wallet', false); }
+      });
+    } else if (err.code === 4001) {
+      notif('Network switch rejected by user', true);
     } else {
-      notif('Failed to switch network', true);
+      // Try addEthereumChain anyway
+      window.ethereum.request({ method: 'wallet_addEthereumChain', params: params })
+      .then(function() { if (onSuccess) onSuccess(); })
+      .catch(function() { notif('Please add network manually in MetaMask', true); });
     }
   });
 }
@@ -706,33 +727,55 @@ function switchChain(key) {
    BALANCE — via MetaMask provider (no CORS)
    ============================================================ */
 function loadBalances() {
-  if (!walletOn || !currentAddr) return;
+  if (!walletOn || !currentAddr || typeof window.ethereum === 'undefined') return;
   var net = TESTNETS[currentChainKey];
   if (!net) return;
   document.getElementById('real-balance').textContent = 'Loading...';
   document.getElementById('usdc-balance').textContent = 'Loading...';
   document.getElementById('balance-chain').textContent = net.name;
+  document.getElementById('active-net').textContent = net.name;
+  document.getElementById('active-net').style.color = net.color;
+  document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
 
-  // Native balance via MetaMask
+  // Native ETH/token balance via MetaMask provider
   window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
   .then(function(hex) {
-    var val = (parseInt(hex, 16) / 1e18).toFixed(4);
+    if (!hex || hex === '0x') { document.getElementById('real-balance').textContent = '0.0000 ' + net.symbol; return; }
+    var wei = parseInt(hex, 16);
+    var val = (wei / 1e18).toFixed(4);
     document.getElementById('real-balance').textContent = val + ' ' + net.symbol;
   })
-  .catch(function() { document.getElementById('real-balance').textContent = '-- ' + net.symbol; });
+  .catch(function(e) {
+    document.getElementById('real-balance').textContent = '0.0000 ' + net.symbol;
+  });
 
-  // USDC balanceOf via MetaMask
-  var data = '0x70a08231' + '000000000000000000000000' + currentAddr.replace('0x','').toLowerCase();
-  window.ethereum.request({ method: 'eth_call', params: [{ to: net.usdcAddr, data: data }, 'latest'] })
+  // USDC ERC20 balanceOf — encode: 0x70a08231 + padded address
+  var addrPadded = currentAddr.replace('0x','').toLowerCase();
+  while (addrPadded.length < 64) addrPadded = '0' + addrPadded;
+  var callData = '0x70a08231' + addrPadded;
+  window.ethereum.request({
+    method: 'eth_call',
+    params: [{ to: net.usdcAddr, data: callData }, 'latest']
+  })
   .then(function(hex) {
-    var usdc = (hex && hex.length > 2) ? (parseInt(hex, 16) / 1e6).toFixed(2) : '0.00';
+    var usdc = '0.00';
+    if (hex && hex !== '0x' && hex.length > 2) {
+      var raw = parseInt(hex, 16);
+      if (!isNaN(raw)) usdc = (raw / 1e6).toFixed(2);
+    }
     document.getElementById('usdc-balance').textContent = usdc + ' USDC';
     document.getElementById('usdc-chain').textContent = net.name;
-    var sb = document.getElementById('send-balance'); if (sb) sb.textContent = usdc + ' USDC';
-    var bar = document.getElementById('bar-bal-' + currentChainKey); if (bar) bar.textContent = usdc + ' USDC';
-    document.getElementById('ai-insight').textContent = 'You have ' + usdc + ' USDC on ' + net.name + '. Ask me about yield or bridging!';
+    var sb = document.getElementById('send-balance');
+    if (sb) sb.textContent = usdc + ' USDC';
+    var bar = document.getElementById('bar-bal-' + currentChainKey);
+    if (bar) bar.textContent = usdc + ' USDC';
+    document.getElementById('ai-insight').textContent =
+      'You have ' + usdc + ' USDC on ' + net.name + '. Ask me about yield, gas or bridging!';
   })
-  .catch(function() { document.getElementById('usdc-balance').textContent = '0.00 USDC'; });
+  .catch(function() {
+    document.getElementById('usdc-balance').textContent = '0.00 USDC';
+    document.getElementById('usdc-chain').textContent = net.name;
+  });
 }
 
 /* ============================================================
@@ -851,17 +894,7 @@ function sendTx(txParams, net, btn) {
 }
 
 function switchToNet(key, cb) {
-  var net = TESTNETS[key];
-  window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: net.chainId }] })
-  .then(cb)
-  .catch(function(err) {
-    if (err.code === 4902) {
-      window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [{ chainId: net.chainId, chainName: net.name, rpcUrls: [net.rpc], nativeCurrency: { name: net.symbol, symbol: net.symbol, decimals: 18 }, blockExplorerUrls: [net.explorer] }]
-      }).then(cb).catch(function() { notif('Add network failed', true); });
-    } else { cb(); }
-  });
+  addOrSwitchNet(key, cb);
 }
 
 /* ============================================================
