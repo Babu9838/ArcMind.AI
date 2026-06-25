@@ -559,7 +559,7 @@ function connectWithProvider(icon, walletName) {
     var urls = {
       'MetaMask': 'https://metamask.io/download/',
       'Brave': 'https://brave.com/download/',
-      'Coinbase': 'https://www.coinbase.com/wallet/downloads'
+      'Coinbase':'https://www.coinbase.com/wallet/downloads'
     };
     showInstall(walletName, urls[walletName] || 'https://metamask.io/download/');
     return;
@@ -703,58 +703,36 @@ function switchChain(key) {
 }
 
 /* ============================================================
-   BALANCE — real RPC calls
+   BALANCE — via MetaMask provider (no CORS)
    ============================================================ */
 function loadBalances() {
   if (!walletOn || !currentAddr) return;
   var net = TESTNETS[currentChainKey];
   if (!net) return;
-
   document.getElementById('real-balance').textContent = 'Loading...';
   document.getElementById('usdc-balance').textContent = 'Loading...';
   document.getElementById('balance-chain').textContent = net.name;
 
-  // Native balance via eth_getBalance
-  rpcCall(net.rpc, 'eth_getBalance', [currentAddr, 'latest'])
-  .then(function(res) {
-    if (res && res.result) {
-      var wei = parseInt(res.result, 16);
-      var eth = (wei / 1e18).toFixed(4);
-      document.getElementById('real-balance').textContent = eth + ' ' + net.symbol;
-    }
+  // Native balance via MetaMask
+  window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
+  .then(function(hex) {
+    var val = (parseInt(hex, 16) / 1e18).toFixed(4);
+    document.getElementById('real-balance').textContent = val + ' ' + net.symbol;
   })
-  .catch(function() { document.getElementById('real-balance').textContent = 'RPC error'; });
+  .catch(function() { document.getElementById('real-balance').textContent = '-- ' + net.symbol; });
 
-  // USDC balance via balanceOf ERC20 call
-  var data = '0x70a08231' + '000000000000000000000000' + currentAddr.slice(2);
-  rpcCall(net.rpc, 'eth_call', [{ to: net.usdcAddr, data: data }, 'latest'])
-  .then(function(res) {
-    if (res && res.result && res.result !== '0x') {
-      var raw = parseInt(res.result, 16);
-      var usdc = (raw / 1e6).toFixed(2);
-      document.getElementById('usdc-balance').textContent = usdc + ' USDC';
-      document.getElementById('usdc-chain').textContent = net.name + ' testnet';
-      document.getElementById('send-balance').textContent = usdc + ' USDC';
-      // update bar
-      var bar = document.getElementById('bar-bal-' + currentChainKey);
-      if (bar) bar.textContent = usdc + ' USDC';
-    } else {
-      document.getElementById('usdc-balance').textContent = '0.00 USDC';
-      document.getElementById('send-balance').textContent = '0.00';
-    }
+  // USDC balanceOf via MetaMask
+  var data = '0x70a08231' + '000000000000000000000000' + currentAddr.replace('0x','').toLowerCase();
+  window.ethereum.request({ method: 'eth_call', params: [{ to: net.usdcAddr, data: data }, 'latest'] })
+  .then(function(hex) {
+    var usdc = (hex && hex.length > 2) ? (parseInt(hex, 16) / 1e6).toFixed(2) : '0.00';
+    document.getElementById('usdc-balance').textContent = usdc + ' USDC';
+    document.getElementById('usdc-chain').textContent = net.name;
+    var sb = document.getElementById('send-balance'); if (sb) sb.textContent = usdc + ' USDC';
+    var bar = document.getElementById('bar-bal-' + currentChainKey); if (bar) bar.textContent = usdc + ' USDC';
+    document.getElementById('ai-insight').textContent = 'You have ' + usdc + ' USDC on ' + net.name + '. Ask me about yield or bridging!';
   })
   .catch(function() { document.getElementById('usdc-balance').textContent = '0.00 USDC'; });
-
-  // Update AI insight
-  document.getElementById('ai-insight').textContent = 'Wallet connected on ' + net.name + '. Fetching balance... Ask me about yield opportunities on testnet!';
-}
-
-function rpcCall(url, method, params) {
-  return fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc: '2.0', method: method, params: params, id: 1 })
-  }).then(function(r) { return r.json(); });
 }
 
 /* ============================================================
@@ -946,7 +924,7 @@ function sendAI() {
   addChat('u', msg);
   aiHist.push({ role: 'user', content: msg });
   showTyping();
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -993,7 +971,7 @@ function toggleVoice() {
     b.style.cssText = 'padding:5px 12px;border-radius:20px;border:1px solid #ef4444;background:rgba(239,68,68,.15);color:#ef4444;font-weight:700;font-size:11px;cursor:pointer';
     b.innerHTML = '&#x1F3A4; Listening...';
     var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if(SR) {
+    if (SR) {
       var rec = new SR();
       rec.onresult = function(e) { document.getElementById('ai-in').value = e.results[0][0].transcript; };
       rec.onend = function() { toggleVoice(); };
@@ -1019,7 +997,7 @@ function runSim() {
   btn.innerHTML = '<span class="loading"></span>Simulating...'; btn.disabled = true;
   document.getElementById('sim-res').style.display = 'none';
   var prompt = 'Simulate on ' + (net.name || netKey) + ' with token ' + token + ': ' + inp;
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -1083,7 +1061,7 @@ function runFraud() {
   var btn = document.getElementById('fraud-btn');
   btn.innerHTML = '<span class="loading"></span>Scanning...'; btn.disabled = true;
   document.getElementById('fraud-res').style.display = 'none';
-  fetch('https://api.anthropic.com/v1/messages', {
+  fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
