@@ -727,9 +727,11 @@ function addOrSwitchNet(key, onSuccess) {
    BALANCE — via MetaMask provider (no CORS)
    ============================================================ */
 function loadBalances() {
-  if (!walletOn || !currentAddr || typeof window.ethereum === 'undefined') return;
+  if (!walletOn || !currentAddr) return;
   var net = TESTNETS[currentChainKey];
   if (!net) return;
+
+  // Update UI labels
   document.getElementById('real-balance').textContent = 'Loading...';
   document.getElementById('usdc-balance').textContent = 'Loading...';
   document.getElementById('balance-chain').textContent = net.name;
@@ -737,32 +739,44 @@ function loadBalances() {
   document.getElementById('active-net').style.color = net.color;
   document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
 
-  // Native ETH/token balance via MetaMask provider
-  window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
-  .then(function(hex) {
-    if (!hex || hex === '0x') { document.getElementById('real-balance').textContent = '0.0000 ' + net.symbol; return; }
-    var wei = parseInt(hex, 16);
-    var val = (wei / 1e18).toFixed(4);
+  var rpc = net.rpc;
+
+  // Helper: JSON-RPC call via fetch
+  function rpcFetch(method, params) {
+    return fetch(rpc, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
+    }).then(function(r) { return r.json(); });
+  }
+
+  // Native balance
+  rpcFetch('eth_getBalance', [currentAddr, 'latest'])
+  .then(function(res) {
+    var hex = res && res.result ? res.result : '0x0';
+    var val = (parseInt(hex, 16) / 1e18).toFixed(4);
     document.getElementById('real-balance').textContent = val + ' ' + net.symbol;
   })
-  .catch(function(e) {
-    document.getElementById('real-balance').textContent = '0.0000 ' + net.symbol;
+  .catch(function() {
+    // Fallback: MetaMask provider
+    if (window.ethereum) {
+      window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
+      .then(function(hex) {
+        document.getElementById('real-balance').textContent = (parseInt(hex, 16) / 1e18).toFixed(4) + ' ' + net.symbol;
+      }).catch(function() {
+        document.getElementById('real-balance').textContent = '-- ' + net.symbol;
+      });
+    }
   });
 
-  // USDC ERC20 balanceOf — encode: 0x70a08231 + padded address
-  var addrPadded = currentAddr.replace('0x','').toLowerCase();
-  while (addrPadded.length < 64) addrPadded = '0' + addrPadded;
-  var callData = '0x70a08231' + addrPadded;
-  window.ethereum.request({
-    method: 'eth_call',
-    params: [{ to: net.usdcAddr, data: callData }, 'latest']
-  })
-  .then(function(hex) {
-    var usdc = '0.00';
-    if (hex && hex !== '0x' && hex.length > 2) {
-      var raw = parseInt(hex, 16);
-      if (!isNaN(raw)) usdc = (raw / 1e6).toFixed(2);
-    }
+  // USDC balanceOf
+  var pad = currentAddr.replace('0x', '').toLowerCase().padStart(64, '0');
+  var callData = '0x70a08231' + pad;
+  rpcFetch('eth_call', [{ to: net.usdcAddr, data: callData }, 'latest'])
+  .then(function(res) {
+    var hex = res && res.result ? res.result : '0x';
+    var usdc = (hex && hex.length > 2) ? (parseInt(hex, 16) / 1e6).toFixed(2) : '0.00';
+    if (isNaN(parseFloat(usdc))) usdc = '0.00';
     document.getElementById('usdc-balance').textContent = usdc + ' USDC';
     document.getElementById('usdc-chain').textContent = net.name;
     var sb = document.getElementById('send-balance');
@@ -839,58 +853,96 @@ function estimateGas() {
 
 function doRealSend() {
   if (!walletOn) { notif('Connect wallet first', true); return; }
+  if (!window.ethereum) { notif('No wallet found', true); return; }
   var to = document.getElementById('send-to').value.trim();
   var amt = document.getElementById('send-amt').value.trim();
   var netKey = document.getElementById('send-net').value;
   var token = document.getElementById('send-token').value;
   if (!to || !amt) { notif('Fill recipient and amount', true); return; }
-  if (!/^0x[0-9a-fA-F]{40}$/.test(to)) { notif('Invalid address format', true); return; }
+  if (!/^0x[0-9a-fA-F]{40}$/.test(to)) { notif('Invalid address (must be 0x...)', true); return; }
   if (parseFloat(amt) <= 0) { notif('Enter valid amount', true); return; }
 
   var net = TESTNETS[netKey];
   var btn = document.getElementById('send-btn');
-  btn.innerHTML = '<span class="loading"></span>Confirming in wallet...';
+  var statusEl = document.getElementById('send-status');
+  btn.innerHTML = '<span class="loading"></span>Switching network...';
   btn.disabled = true;
-  document.getElementById('send-status').textContent = 'Waiting for signature...';
-  document.getElementById('send-status').style.color = '#f59e0b';
+  statusEl.textContent = 'Switching network...';
+  statusEl.style.color = '#f59e0b';
 
-  // Switch network first if needed
-  switchToNet(netKey, function() {
-    var txParams;
-    if (token === 'native') {
-      var weiHex = '0x' + Math.floor(parseFloat(amt) * 1e18).toString(16);
-      txParams = { from: currentAddr, to: to, value: weiHex, gas: '0x5208' };
-      sendTx(txParams, net, btn);
+  // Step 1: ensure correct network
+  window.ethereum.request({ method: 'eth_chainId' })
+  .then(function(cid) {
+    var onNetwork = parseInt(cid, 16) === net.chainIdDec;
+    if (onNetwork) {
+      // Already on correct network — send immediately
+      btn.innerHTML = '<span class="loading"></span>Waiting for wallet...';
+      statusEl.textContent = 'Check your wallet...';
+      buildAndSend(to, amt, token, net, btn, statusEl);
     } else {
-      // ERC20 USDC transfer
-      var amtWei = Math.floor(parseFloat(amt) * 1e6);
-      var data = '0xa9059cbb'
-        + to.slice(2).padStart(64, '0')
-        + amtWei.toString(16).padStart(64, '0');
-      txParams = { from: currentAddr, to: net.usdcAddr, data: data, gas: '0x186A0' };
-      sendTx(txParams, net, btn);
+      // Need to switch
+      statusEl.textContent = 'Confirm network switch in wallet...';
+      window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: net.chainId }] })
+      .then(function() {
+        btn.innerHTML = '<span class="loading"></span>Waiting for wallet...';
+        statusEl.textContent = 'Check your wallet...';
+        buildAndSend(to, amt, token, net, btn, statusEl);
+      })
+      .catch(function(err) {
+        if (err.code === 4902) {
+          // Add network first
+          var rpcs = net.rpcFallback ? [net.rpc, net.rpcFallback] : [net.rpc];
+          window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+            chainId: net.chainId, chainName: net.name, rpcUrls: rpcs,
+            nativeCurrency: { name: net.symbol, symbol: net.symbol, decimals: 18 },
+            blockExplorerUrls: [net.explorer]
+          }]})
+          .then(function() {
+            btn.innerHTML = '<span class="loading"></span>Waiting for wallet...';
+            statusEl.textContent = 'Check your wallet...';
+            buildAndSend(to, amt, token, net, btn, statusEl);
+          })
+          .catch(function() { resetSendBtn(btn, statusEl, 'Add network failed'); });
+        } else if (err.code === 4001) {
+          resetSendBtn(btn, statusEl, 'Network switch rejected');
+        } else {
+          resetSendBtn(btn, statusEl, 'Network error');
+        }
+      });
     }
   });
 }
 
-function sendTx(txParams, net, btn) {
+function buildAndSend(to, amt, token, net, btn, statusEl) {
+  var txParams;
+  if (token === 'native') {
+    var weiHex = '0x' + Math.floor(parseFloat(amt) * 1e18).toString(16);
+    txParams = { from: currentAddr, to: to, value: weiHex };
+  } else {
+    var amtWei = Math.floor(parseFloat(amt) * 1e6);
+    var toHex = to.replace('0x','').toLowerCase().padStart(64,'0');
+    var amtHex = amtWei.toString(16).padStart(64,'0');
+    txParams = { from: currentAddr, to: net.usdcAddr, data: '0xa9059cbb' + toHex + amtHex };
+  }
   window.ethereum.request({ method: 'eth_sendTransaction', params: [txParams] })
   .then(function(txHash) {
     btn.innerHTML = 'Send &#x2192;'; btn.disabled = false;
-    document.getElementById('send-status').textContent = 'Confirmed!';
-    document.getElementById('send-status').style.color = '#10b981';
+    statusEl.textContent = 'Sent!'; statusEl.style.color = '#10b981';
     var linkEl = document.getElementById('send-tx-link');
     linkEl.style.display = 'block';
-    linkEl.innerHTML = '&#x1F517; <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">View on Explorer: ' + txHash.slice(0,18) + '...</a>';
+    linkEl.innerHTML = '&#x1F517; <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">View: ' + txHash.slice(0,20) + '...</a>';
     notif('Transaction sent!');
-    loadBalances();
+    setTimeout(loadBalances, 3000);
   })
   .catch(function(err) {
-    btn.innerHTML = 'Send &#x2192;'; btn.disabled = false;
-    document.getElementById('send-status').textContent = 'Failed';
-    document.getElementById('send-status').style.color = '#ef4444';
-    notif(err.code === 4001 ? 'Transaction rejected' : 'Transaction failed', true);
+    resetSendBtn(btn, statusEl, err.code === 4001 ? 'Rejected by user' : 'Transaction failed');
   });
+}
+
+function resetSendBtn(btn, statusEl, msg) {
+  btn.innerHTML = 'Send &#x2192;'; btn.disabled = false;
+  statusEl.textContent = msg; statusEl.style.color = '#ef4444';
+  notif(msg, true);
 }
 
 function switchToNet(key, cb) {
@@ -925,24 +977,87 @@ function updateBridgeRoute() {
 
 function doBridge() {
   if (!walletOn) { notif('Connect wallet first', true); return; }
+  if (!window.ethereum) { notif('No wallet found', true); return; }
   var amt = document.getElementById('bridge-amt').value;
   var fromKey = document.getElementById('bridge-from').value;
   var toKey = document.getElementById('bridge-to').value;
   if (!amt || parseFloat(amt) <= 0) { notif('Enter bridge amount', true); return; }
   if (fromKey === toKey) { notif('Select different networks', true); return; }
-  var btn = document.getElementById('bridge-btn');
+
   var fromNet = TESTNETS[fromKey];
   var toNet = TESTNETS[toKey];
-  btn.innerHTML = '<span class="loading"></span>Initiating CCTP bridge...';
+  var btn = document.getElementById('bridge-btn');
+  var linkEl = document.getElementById('bridge-tx-link');
+
+  // CCTP TokenMessenger contract addresses (testnet)
+  var CCTP = {
+    'arb-sep': '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
+    'sepolia':  '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5',
+    'arc':      '0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5'
+  };
+  // CCTP destination domain IDs
+  var DOMAINS = { 'sepolia': 0, 'arb-sep': 3, 'arc': 6 };
+
+  btn.innerHTML = '<span class="loading"></span>Step 1/3: Switching network...';
   btn.disabled = true;
-  switchToNet(fromKey, function() {
-    notif('Bridge initiated: ' + amt + ' USDC ' + fromNet.name + ' to ' + toNet.name);
-    setTimeout(function() {
-      btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
-      var linkEl = document.getElementById('bridge-tx-link');
-      linkEl.style.display = 'block';
-      linkEl.innerHTML = '&#x1F517; Bridge submitted on ' + fromNet.name + '. Check <a href="' + fromNet.explorer + '" target="_blank" style="color:#6366f1">' + fromNet.explorer + '</a>';
-    }, 2000);
+
+  // Step 1: Switch to source network
+  window.ethereum.request({ method: 'eth_chainId' })
+  .then(function(cid) {
+    var alreadyOn = parseInt(cid, 16) === fromNet.chainIdDec;
+    if (alreadyOn) return Promise.resolve();
+    return window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: fromNet.chainId }] })
+    .catch(function(err) {
+      if (err.code === 4902) {
+        var rpcs = fromNet.rpcFallback ? [fromNet.rpc, fromNet.rpcFallback] : [fromNet.rpc];
+        return window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+          chainId: fromNet.chainId, chainName: fromNet.name, rpcUrls: rpcs,
+          nativeCurrency: { name: fromNet.symbol, symbol: fromNet.symbol, decimals: 18 },
+          blockExplorerUrls: [fromNet.explorer]
+        }]});
+      }
+      throw err;
+    });
+  })
+  // Step 2: Approve USDC for TokenMessenger
+  .then(function() {
+    btn.innerHTML = '<span class="loading"></span>Step 2/3: Approve USDC in wallet...';
+    var amtWei = Math.floor(parseFloat(amt) * 1e6);
+    var spenderHex = CCTP[fromKey].replace('0x','').toLowerCase().padStart(64,'0');
+    var amtHex = amtWei.toString(16).padStart(64,'0');
+    var approveData = '0x095ea7b3' + spenderHex + amtHex;
+    return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
+      from: currentAddr, to: fromNet.usdcAddr, data: approveData
+    }]});
+  })
+  // Step 3: Call depositForBurn on CCTP
+  .then(function(approveTx) {
+    btn.innerHTML = '<span class="loading"></span>Step 3/3: Confirm bridge in wallet...';
+    notif('Approval done! Confirm bridge tx...');
+    var amtWei = Math.floor(parseFloat(amt) * 1e6);
+    var domain = DOMAINS[toKey] !== undefined ? DOMAINS[toKey] : 0;
+    var mintRecipient = currentAddr.replace('0x','').toLowerCase().padStart(64,'0');
+    // depositForBurn(uint256 amount, uint32 destinationDomain, bytes32 mintRecipient, address burnToken)
+    var sig = '0x6fd3504e';
+    var amtHex = amtWei.toString(16).padStart(64,'0');
+    var domHex = domain.toString(16).padStart(64,'0');
+    var burnToken = fromNet.usdcAddr.replace('0x','').toLowerCase().padStart(64,'0');
+    var burnData = sig + amtHex + domHex + mintRecipient + burnToken;
+    return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
+      from: currentAddr, to: CCTP[fromKey], data: burnData
+    }]});
+  })
+  .then(function(txHash) {
+    btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
+    linkEl.style.display = 'block';
+    linkEl.innerHTML = '&#x2705; Bridge TX: <a href="' + fromNet.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">' + txHash.slice(0,20) + '...</a><br><span style="font-size:11px;color:#94a3b8">USDC will arrive on ' + toNet.name + ' in ~2-3 min</span>';
+    notif('Bridge submitted! USDC arriving in ~2-3 min');
+    setTimeout(loadBalances, 5000);
+  })
+  .catch(function(err) {
+    btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
+    if (err.code === 4001) { notif('Bridge rejected by user', true); }
+    else { notif('Bridge error: ' + (err.message ? err.message.slice(0,60) : 'Please try again'), true); }
   });
 }
 
