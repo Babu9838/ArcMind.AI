@@ -129,7 +129,7 @@ input::placeholder,textarea::placeholder{color:#475569}
   <div id="dash-body" style="display:none">
     <div class="sg">
       <div class="sc" style="background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(10,22,40,.8));border:1px solid rgba(99,102,241,.2)">
-        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">Wallet Balance</span><span style="font-size:20px">&#x1F4B0;</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:11px;color:#64748b;font-weight:600">USDC Balance (Wallet)</span><span style="font-size:20px">&#x1F4B0;</span></div>
         <div id="real-balance" style="font-size:26px;font-weight:800;color:#6366f1">Loading...</div>
         <div id="balance-chain" style="font-size:11px;color:#475569;margin-top:4px">Fetching from chain...</div>
       </div>
@@ -181,7 +181,7 @@ input::placeholder,textarea::placeholder{color:#475569}
       <div style="margin-bottom:14px">
         <label class="lbl">Network</label>
         <select id="send-net" class="inp" style="cursor:pointer" onchange="onSendNetChange()">
-          <option value="arc">Arc Testnet (Chain 1338)</option>
+          <option value="arc">Arc Testnet (Chain 5042002)</option>
           <option value="arb-sep">Arbitrum Sepolia (Chain 421614)</option>
           <option value="sepolia">Sepolia ETH (Chain 11155111)</option>
         </select>
@@ -316,7 +316,7 @@ input::placeholder,textarea::placeholder{color:#475569}
       <div style="margin-bottom:14px">
         <label class="lbl">Network</label>
         <select id="sim-net" class="inp" style="cursor:pointer">
-          <option value="arc">Arc Testnet (Chain 1338)</option>
+          <option value="arc">Arc Testnet (Chain 5042002)</option>
           <option value="arb-sep">Arbitrum Sepolia (Chain 421614)</option>
           <option value="sepolia">Sepolia ETH (Chain 11155111)</option>
         </select>
@@ -655,10 +655,11 @@ function showInstall(name, url) {
    ============================================================ */
 function getChainKey(hexId) {
   var id = parseInt(hexId, 16);
+  if (id === 5042002) return 'arc';
   if (id === 1338) return 'arc';
   if (id === 421614) return 'arb-sep';
   if (id === 11155111) return 'sepolia';
-  return 'unknown';
+  return 'sepolia'; // default to sepolia for unknown
 }
 
 function updateChainUI(key) {
@@ -738,18 +739,9 @@ function loadBalances() {
   document.getElementById('active-net').style.color = net.color;
   document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
 
-  // Use MetaMask provider directly — avoids CORS, always works
-  window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
-  .then(function(hex) {
-    var val = hex && hex !== '0x' ? (parseInt(hex, 16) / 1e18).toFixed(4) : '0.0000';
-    document.getElementById('real-balance').textContent = val + ' ETH';
-  })
-  .catch(function() {
-    document.getElementById('real-balance').textContent = '0.0000 ETH';
-  });
-
-  // USDC balanceOf via MetaMask provider
   var pad = currentAddr.replace('0x','').toLowerCase().padStart(64,'0');
+
+  // Wallet Balance card = USDC balance (primary asset)
   window.ethereum.request({
     method: 'eth_call',
     params: [{ to: net.usdcAddr, data: '0x70a08231' + pad }, 'latest']
@@ -760,6 +752,10 @@ function loadBalances() {
       var raw = parseInt(hex, 16);
       if (!isNaN(raw)) usdc = (raw / 1e6).toFixed(2);
     }
+    // Show USDC in "Wallet Balance" card
+    document.getElementById('real-balance').textContent = usdc + ' USDC';
+    document.getElementById('balance-chain').textContent = net.name;
+    // Show USDC in "USDC Balance" card too
     document.getElementById('usdc-balance').textContent = usdc + ' USDC';
     document.getElementById('usdc-chain').textContent = net.name;
     var sb = document.getElementById('send-balance');
@@ -770,9 +766,18 @@ function loadBalances() {
       'You have ' + usdc + ' USDC on ' + net.name + '. Ask me about yield or bridging!';
   })
   .catch(function() {
+    document.getElementById('real-balance').textContent = '0.00 USDC';
     document.getElementById('usdc-balance').textContent = '0.00 USDC';
     document.getElementById('usdc-chain').textContent = net.name;
   });
+
+  // ETH balance shown only in Active Network card subtitle
+  window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
+  .then(function(hex) {
+    var eth = hex && hex !== '0x' ? (parseInt(hex, 16) / 1e18).toFixed(4) : '0.0000';
+    document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec + ' | ETH: ' + eth;
+  })
+  .catch(function() {});
 }
 
 /* ============================================================
@@ -828,17 +833,18 @@ function estimateGas() {
   var el = document.getElementById('send-gas');
   if (!el) return;
   el.textContent = 'Estimating...';
-  if (!walletOn || !window.ethereum) { el.textContent = '~0.00005 ETH'; return; }
-  // Estimate gas using MetaMask
-  var netKey = document.getElementById('send-net') ? document.getElementById('send-net').value : 'sepolia';
-  var net = TESTNETS[netKey];
+  if (!walletOn || !window.ethereum) { el.textContent = '~0.01 USDC'; return; }
   window.ethereum.request({ method: 'eth_gasPrice' })
   .then(function(gp) {
-    var gasLimit = 65000; // ERC20 transfer
-    var gasCost = (parseInt(gp, 16) * gasLimit) / 1e18;
-    el.textContent = '~' + gasCost.toFixed(6) + ' ETH';
+    var gasLimit = 65000;
+    var ethCost = (parseInt(gp, 16) * gasLimit) / 1e18;
+    // Convert ETH gas to USDC equivalent (~$3000/ETH estimate for testnet display)
+    var usdcCost = (ethCost * 3000).toFixed(4);
+    el.textContent = '~' + usdcCost + ' USDC';
+    // Store ETH cost for actual tx
+    window._lastGasEth = ethCost;
   })
-  .catch(function() { el.textContent = '~0.00005 ETH'; });
+  .catch(function() { el.textContent = '~0.01 USDC'; });
 }
 
 function doRealSend() {
@@ -912,6 +918,7 @@ function buildAndSend(to, amt, token, net, btn, statusEl) {
     var weiHex = '0x' + Math.floor(parseFloat(amt) * 1e18).toString(16);
     txParams = { from: currentAddr, to: to, value: weiHex };
   } else {
+    // USDC ERC20 transfer
     var amtWei = Math.floor(parseFloat(amt) * 1e6);
     var toHex = to.replace('0x','').toLowerCase().padStart(64,'0');
     var amtHex = amtWei.toString(16).padStart(64,'0');
@@ -923,7 +930,10 @@ function buildAndSend(to, amt, token, net, btn, statusEl) {
     statusEl.textContent = 'Sent!'; statusEl.style.color = '#10b981';
     var linkEl = document.getElementById('send-tx-link');
     linkEl.style.display = 'block';
-    linkEl.innerHTML = '&#x1F517; <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">View: ' + txHash.slice(0,20) + '...</a>';
+    var gasEl = document.getElementById('send-gas');
+    var gasDisplay = gasEl ? gasEl.textContent : '~0.01 USDC';
+    linkEl.innerHTML = '&#x2705; Tx: <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">' + txHash.slice(0,20) + '...</a>'
+      + '<br><span style="font-size:11px;color:#94a3b8">Gas fee: ' + gasDisplay + ' deducted</span>';
     notif('Transaction sent!');
     setTimeout(loadBalances, 3000);
   })
