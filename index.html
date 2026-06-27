@@ -257,7 +257,7 @@ input::placeholder,textarea::placeholder{color:#475569}
         <div style="display:flex;justify-content:space-between;padding:5px 0"><span style="color:#64748b;font-size:13px">Route</span><span id="bridge-route" style="color:#6366f1;font-size:13px;font-weight:600">Arc &#x2192; Arb Sepolia</span></div>
       </div>
       <button class="btn" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)" id="bridge-btn" onclick="doBridge()">Bridge via CCTP &#x2192;</button>
-      <div id="bridge-tx-link" style="display:none;margin-top:10px;text-align:center;font-size:style="display:none;margin-top:10px;text-align:center;font-size:12px;color:#6366f1"></div>
+      <div id="bridge-tx-link" style="display:none;margin-top:10px;text-align:center;font-size:12px;color:#6366f1"></div>
     </div>
   </div>
 </section>
@@ -634,6 +634,22 @@ function doWC() {
   ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
   document.body.appendChild(ov);
 }
+
+function showInstall(name, url) {
+  var ov = document.createElement('div'); ov.className = 'ov'; ov.id = 'inst-ov';
+  ov.innerHTML = '<div class="mo" style="text-align:center">'
+    + '<button class="mc" onclick="closeModal(\'inst-ov\')">&#x2715;</button>'
+    + '<div style="font-size:36px;margin-bottom:10px">&#x1F4E6;</div>'
+    + '<div style="font-weight:800;font-size:17px;margin-bottom:6px">' + name + ' Not Found</div>'
+    + '<div style="font-size:13px;color:#64748b;margin-bottom:20px">Install ' + name + ' to continue</div>'
+    + '<div style="display:flex;gap:10px">'
+    + '<button onclick="closeModal(\'inst-ov\')" style="flex:1;padding:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#94a3b8;font-weight:700;cursor:pointer">Cancel</button>'
+    + '<a href="' + url + '" target="_blank" style="flex:1;padding:11px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;color:#fff;font-weight:700;text-decoration:none;display:block;text-align:center">Install Now</a>'
+    + '</div></div>';
+  ov.addEventListener('click', function(e) { if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
+}
+
 /* ============================================================
    CHAIN HELPERS
    ============================================================ */
@@ -725,62 +741,86 @@ function loadBalances() {
 
   var pad = currentAddr.replace('0x','').toLowerCase().padStart(64,'0');
 
-  // Fetch native ETH balance -> shown in Card 2
-  window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
-  .then(function(hex) {
-    var eth = (hex && hex !== '0x') ? (parseInt(hex,16)/1e18).toFixed(4) : '0.0000';
-    window._ethBal = parseFloat(eth);
-    updateWalletCard();
-    document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
-    document.getElementById('balance-chain').textContent = net.name;
-    // card2 subtitle
-    var c2sub = document.getElementById('usdc-chain');
-    if (c2sub) c2sub.textContent = net.name;
-  })
-  .catch(function() { window._ethBal = 0; updateWalletCard(); });
+  // Arc Testnet: native token = USDC (18 decimals via eth_getBalance)
+  // Other chains: native = ETH, USDC via eth_call on ERC20 contract
 
-  // Fetch USDC balance
-  window.ethereum.request({
-    method: 'eth_call',
-    params: [{ to: net.usdcAddr, data: '0x70a08231' + pad }, 'latest']
-  })
-  .then(function(hex) {
-    var usdc = '0.00';
-    if (hex && hex !== '0x' && hex.length > 10) {
-      var raw = parseInt(hex, 16);
-      if (!isNaN(raw)) usdc = (raw / 1e6).toFixed(2);
+  var isArc = (currentChainKey === 'arc');
+
+  if (isArc) {
+    // Arc: eth_getBalance returns USDC (native token)
+    window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
+    .then(function(hex) {
+      var usdc = (hex && hex !== '0x') ? (parseInt(hex,16)/1e18).toFixed(2) : '0.00';
+      document.getElementById('real-balance').textContent = usdc + ' USDC';
+      document.getElementById('usdc-balance').textContent = usdc + ' USDC';
+      document.getElementById('balance-chain').textContent = net.name;
+      document.getElementById('usdc-chain').textContent = net.name;
+      document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
+      var sb = document.getElementById('send-balance');
+      if (sb) sb.textContent = usdc + ' USDC';
+      var bar = document.getElementById('bar-bal-arc');
+      if (bar) bar.textContent = usdc + ' USDC';
+      document.getElementById('ai-insight').textContent =
+        'You have ' + usdc + ' USDC on Arc Testnet. Ask me about yield or bridging!';
+    })
+    .catch(function() {
+      document.getElementById('real-balance').textContent = '0.00 USDC';
+      document.getElementById('usdc-balance').textContent = '0.00 USDC';
+    });
+
+  } else {
+    // Other chains: ETH native + USDC ERC20
+
+    // Native ETH
+    window.ethereum.request({ method: 'eth_getBalance', params: [currentAddr, 'latest'] })
+    .then(function(hex) {
+      var eth = (hex && hex !== '0x') ? (parseInt(hex,16)/1e18).toFixed(4) : '0.0000';
+      window._ethBal = parseFloat(eth);
+      document.getElementById('chain-id-show').textContent = 'Chain ID: ' + net.chainIdDec;
+      document.getElementById('balance-chain').textContent = net.name;
+      // Card 1 shows ETH+USDC combined after both load
+      updateNonArcCard();
+    })
+    .catch(function() { window._ethBal = 0; updateNonArcCard(); });
+
+    // USDC ERC20
+    window.ethereum.request({
+      method: 'eth_call',
+      params: [{ to: net.usdcAddr, data: '0x70a08231' + pad }, 'latest']
+    })
+    .then(function(hex) {
+      var usdc = '0.00';
+      if (hex && hex !== '0x' && hex.length > 10) {
+        var raw = parseInt(hex, 16);
+        if (!isNaN(raw)) usdc = (raw / 1e6).toFixed(2);
+      }
+      window._usdcBal = parseFloat(usdc);
+      document.getElementById('usdc-balance').textContent = usdc + ' USDC';
+      document.getElementById('usdc-chain').textContent = net.name;
+      var sb = document.getElementById('send-balance');
+      if (sb) sb.textContent = usdc + ' USDC';
+      var bar = document.getElementById('bar-bal-' + currentChainKey);
+      if (bar) bar.textContent = usdc + ' USDC';
+      updateNonArcCard();
+    })
+    .catch(function() {
+      window._usdcBal = 0;
+      document.getElementById('usdc-balance').textContent = '0.00 USDC';
+    });
+  }
+
+  function updateNonArcCard() {
+    var eth  = window._ethBal  !== undefined ? window._ethBal  : null;
+    var usdc = window._usdcBal !== undefined ? window._usdcBal : null;
+    var parts = [];
+    if (eth  !== null && eth  > 0) parts.push(eth.toFixed(4)  + ' ETH');
+    if (usdc !== null && usdc > 0) parts.push(usdc.toFixed(2) + ' USDC');
+    if (parts.length === 0 && eth !== null && usdc !== null) parts.push('0.00 USDC');
+    if (parts.length > 0) {
+      document.getElementById('real-balance').textContent = parts.join(' + ');
     }
-    window._usdcBal = parseFloat(usdc);
-    updateWalletCard();
-    // update send-balance and bar with USDC value
-    var sb = document.getElementById('send-balance');
-    if (sb) sb.textContent = usdc + ' USDC';
-    var bar = document.getElementById('bar-bal-' + currentChainKey);
-    if (bar) bar.textContent = usdc + ' USDC';
     document.getElementById('ai-insight').textContent =
-      'USDC: ' + usdc + ' | ETH: ' + (window._ethBal||0).toFixed(4) + ' on ' + net.name;
-  })
-  .catch(function() {
-    window._usdcBal = 0;
-    document.getElementById('real-balance').textContent = '0.00 USDC';
-  });
-
-  function updateWalletCard() {
-    var native = window._ethBal !== undefined ? window._ethBal : null;
-    var usdc   = window._usdcBal !== undefined ? window._usdcBal : null;
-    var netKey = currentChainKey;
-
-    // Card 1 (real-balance) = USDC balance
-    if (usdc !== null) {
-      document.getElementById('real-balance').textContent =
-        (usdc > 0 ? usdc.toFixed(2) : '0.00') + ' USDC';
-    }
-
-    // Card 2 (usdc-balance) = Native token (ETH on all testnets)
-    if (native !== null) {
-      document.getElementById('usdc-balance').textContent =
-        (native > 0 ? native.toFixed(4) : '0.0000') + ' ETH';
-    }
+      'ETH: ' + (eth||0).toFixed(4) + ' | USDC: ' + (usdc||0).toFixed(2) + ' on ' + net.name;
   }
 }
 
