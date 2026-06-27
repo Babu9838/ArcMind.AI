@@ -557,8 +557,7 @@ function closeModal(id) { var el = document.getElementById(id); if (el) el.remov
 /* Universal connect — works with MetaMask, Brave, Coinbase, any injected wallet */
 function connectWithProvider(icon, walletName) {
   /* No provider at all — show install */
-  if (typeof window.ethereum === 'undefined') {
-    closeModal('wm');
+  if (typeof window.ethereum === 'undefined') {closeModal('wm');
     var urls = {
       'MetaMask': 'https://metamask.io/download/',
       'Brave': 'https://brave.com/download/',
@@ -960,17 +959,28 @@ function doRealSend() {
 }
 
 function buildAndSend(to, amt, token, net, btn, statusEl) {
-  // Get gas price first (legacy type:0 — works on all testnets incl Arc)
+  var isArc = (currentChainKey === 'arc');
+
   window.ethereum.request({ method: 'eth_gasPrice' })
   .then(function(gp) {
-    // Bump gas price 20% for faster inclusion
-    var gpInt = Math.floor(parseInt(gp, 16) * 1.2);
-    var gpHex = '0x' + gpInt.toString(16);
+    var gpHex = '0x' + Math.floor(parseInt(gp||'0x1',16) * 1.2).toString(16);
     var txParams;
-    if (token === 'native') {
-      var weiHex = '0x' + Math.floor(parseFloat(amt) * 1e18).toString(16);
-      txParams = { from: currentAddr, to: to, value: weiHex, gasPrice: gpHex, gas: '0x5208' };
+
+    if (isArc) {
+      // Arc Testnet: native token IS USDC — use simple ETH transfer (18 decimals)
+      var weiHex = '0x' + BigInt(Math.round(parseFloat(amt) * 1e18)).toString(16);
+      txParams = {
+        from: currentAddr,
+        to: to,
+        value: weiHex,
+        gasPrice: gpHex,
+        gas: '0x5208'
+      };
+    } else if (token === 'native') {
+      var weiHex2 = '0x' + BigInt(Math.round(parseFloat(amt) * 1e18)).toString(16);
+      txParams = { from: currentAddr, to: to, value: weiHex2, gasPrice: gpHex, gas: '0x5208' };
     } else {
+      // ERC20 USDC transfer (Sepolia, Arb Sepolia — 6 decimals)
       var amtWei = Math.floor(parseFloat(amt) * 1e6);
       var toHex = to.replace('0x','').toLowerCase().padStart(64,'0');
       var amtHex = amtWei.toString(16).padStart(64,'0');
@@ -989,12 +999,12 @@ function buildAndSend(to, amt, token, net, btn, statusEl) {
     statusEl.textContent = 'Sent!'; statusEl.style.color = '#10b981';
     var linkEl = document.getElementById('send-tx-link');
     linkEl.style.display = 'block';
-    linkEl.innerHTML = '&#x2705; Tx: <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">' + txHash.slice(0,20) + '...</a>';
+    linkEl.innerHTML = '&#x2705; <a href="' + net.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">View Tx: ' + txHash.slice(0,18) + '...</a>';
     notif('Transaction sent!');
     setTimeout(loadBalances, 3000);
   })
   .catch(function(err) {
-    resetSendBtn(btn, statusEl, err.code === 4001 ? 'Rejected by user' : (err.message||'Transaction failed').slice(0,50));
+    resetSendBtn(btn, statusEl, err.code === 4001 ? 'Rejected by user' : (err.message||'Transaction failed').slice(0,60));
   });
 }
 
@@ -1062,46 +1072,58 @@ function doBridge() {
   linkEl.style.display = 'none';
 
   function doStep2() {
-    // Get gas price first — use legacy type:0 to avoid EIP-1559 issues on Arc
+    var isArcFrom = (fromKey === 'arc');
     window.ethereum.request({ method: 'eth_gasPrice' })
     .then(function(gp) {
-      var gpHex = '0x' + Math.floor(parseInt(gp,16) * 1.2).toString(16);
-      var amtWei = Math.floor(parseFloat(amt) * 1e6);
-      var spender = CCTP[fromKey].replace('0x','').toLowerCase().padStart(64,'0');
-      var amtHex = amtWei.toString(16).padStart(64,'0');
+      var gpHex = '0x' + Math.floor(parseInt(gp||'0x1',16) * 1.2).toString(16);
+      var amtWei18 = BigInt(Math.round(parseFloat(amt) * 1e18));
+      var amtWei6  = Math.floor(parseFloat(amt) * 1e6);
 
-      btn.innerHTML = '<span class="loading"></span>Step 1/2: Approve USDC in wallet...';
-      // Approve USDC
-      return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
-        from: currentAddr,
-        to: fromNet.usdcAddr,
-        data: '0x095ea7b3' + spender + amtHex,
-        gasPrice: gpHex,
-        gas: '0x186A0'
-      }]}).then(function() { return gpHex; });
-    })
-    .then(function(gpHex) {
-      btn.innerHTML = '<span class="loading"></span>Step 2/2: Confirm bridge in wallet...';
-      notif('Approval done! Confirm bridge...');
-      var amtWei = Math.floor(parseFloat(amt) * 1e6);
-      var domain = DOMAINS[toKey] !== undefined ? DOMAINS[toKey] : 0;
-      var recipient = currentAddr.replace('0x','').toLowerCase().padStart(64,'0');
-      var burnToken = fromNet.usdcAddr.replace('0x','').toLowerCase().padStart(64,'0');
-      var a = amtWei.toString(16).padStart(64,'0');
-      var d = domain.toString(16).padStart(64,'0');
-      return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
-        from: currentAddr,
-        to: CCTP[fromKey],
-        data: '0x6fd3504e' + a + d + recipient + burnToken,
-        gasPrice: gpHex,
-        gas: '0x30D40'
-      }]});
+      if (isArcFrom) {
+        // Arc: native USDC — send native token to CCTP bridge address
+        btn.innerHTML = '<span class="loading"></span>Confirm bridge in wallet...';
+        var weiHex = '0x' + amtWei18.toString(16);
+        return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
+          from: currentAddr,
+          to: CCTP[fromKey],
+          value: weiHex,
+          gasPrice: gpHex,
+          gas: '0x30D40'
+        }]});
+      } else {
+        // ERC20 chains: approve then depositForBurn
+        btn.innerHTML = '<span class="loading"></span>Step 1/2: Approve USDC in wallet...';
+        var spender = CCTP[fromKey].replace('0x','').toLowerCase().padStart(64,'0');
+        var amtHex6 = amtWei6.toString(16).padStart(64,'0');
+        return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
+          from: currentAddr,
+          to: fromNet.usdcAddr,
+          data: '0x095ea7b3' + spender + amtHex6,
+          gasPrice: gpHex,
+          gas: '0x186A0'
+        }]}).then(function() {
+          btn.innerHTML = '<span class="loading"></span>Step 2/2: Confirm bridge in wallet...';
+          notif('Approval done! Confirm bridge...');
+          var domain = DOMAINS[toKey] !== undefined ? DOMAINS[toKey] : 0;
+          var recipient = currentAddr.replace('0x','').toLowerCase().padStart(64,'0');
+          var burnToken = fromNet.usdcAddr.replace('0x','').toLowerCase().padStart(64,'0');
+          var a = amtWei6.toString(16).padStart(64,'0');
+          var d = domain.toString(16).padStart(64,'0');
+          return window.ethereum.request({ method: 'eth_sendTransaction', params: [{
+            from: currentAddr,
+            to: CCTP[fromKey],
+            data: '0x6fd3504e' + a + d + recipient + burnToken,
+            gasPrice: gpHex,
+            gas: '0x30D40'
+          }]});
+        });
+      }
     })
     .then(function(txHash) {
       btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
       linkEl.style.display = 'block';
       linkEl.innerHTML = '&#x2705; Bridge TX: <a href="' + fromNet.explorer + '/tx/' + txHash + '" target="_blank" style="color:#6366f1">' + txHash.slice(0,20) + '...</a>'
-        + '<br><span style="font-size:11px;color:#94a3b8">USDC will arrive on ' + toNet.name + ' shortly</span>';
+        + '<br><span style="font-size:11px;color:#94a3b8">USDC arriving on ' + toNet.name + ' shortly</span>';
       notif('Bridge submitted!');
       setTimeout(loadBalances, 5000);
     })
@@ -1115,25 +1137,35 @@ function doBridge() {
   // Switch to source network first
   window.ethereum.request({ method: 'eth_chainId' })
   .then(function(cid) {
-    if (parseInt(cid,16) === fromNet.chainIdDec) { doStep2(); return; }
-    window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: fromHexId }] })
-    .then(doStep2)
+    if (parseInt(cid,16) === fromNet.chainIdDec) {
+      doStep2();
+      return;
+    }
+    btn.innerHTML = '<span class="loading"></span>Adding/switching network...';
+    // Try add first (handles both new and existing networks)
+    window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
+      chainId: fromHexId,
+      chainName: fromNet.name,
+      rpcUrls: [fromNet.rpc],
+      nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+      blockExplorerUrls: [fromNet.explorer]
+    }]})
+    .then(function() {
+      // After add/switch, wait briefly then proceed
+      setTimeout(doStep2, 1500);
+    })
     .catch(function(e) {
-      if (e.code === 4902 || e.code === -32603) {
-        window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{
-          chainId: fromHexId, chainName: fromNet.name, rpcUrls: [fromNet.rpc],
-          nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-          blockExplorerUrls: [fromNet.explorer]
-        }]}).then(doStep2)
-        .catch(function(e2) {
-          btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
-          notif(e2.code === 4001 ? 'Rejected' : 'Add network failed', true);
-        });
-      } else if (e.code === 4001) {
+      if (e.code === 4001) {
         btn.innerHTML = 'Bridge via CCTP &#x2192;'; btn.disabled = false;
         notif('Rejected by user', true);
       } else {
-        doStep2();
+        // Try switch anyway
+        window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: fromHexId }] })
+        .then(function() { setTimeout(doStep2, 1000); })
+        .catch(function() {
+          // Proceed anyway — user may already be on right network
+          doStep2();
+        });
       }
     });
   });
